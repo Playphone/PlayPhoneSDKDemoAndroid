@@ -1,12 +1,7 @@
 package com.playphone.sdk.example;
 
-
-import java.util.List;
-
 import com.playphone.multinet.*;
-import com.playphone.multinet.core.MNSession;
 
-import android.app.ActivityManager;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -276,7 +271,7 @@ public class MainActivity extends ListActivity {
 		
 	}
     
-    
+    /*
     private boolean detectActivityOnTop(String classname){
 		Log.d("playphone","Check for classname: " + classname);
     	// get a list of running processes and iterate through them
@@ -291,4 +286,5 @@ public class MainActivity extends ListActivity {
 	        return false;
 
     }
+    */
 }

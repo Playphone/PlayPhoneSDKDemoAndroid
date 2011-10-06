@@ -1,6 +1,5 @@
 package com.playphone.sdk.example;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -25,8 +24,6 @@ public class LogoutActivity extends CustomTitleActivity{
 				LogoutActivity.this.finish();
 			}
 		});
-		
-        
         
         Button btnLogoutWipe = (Button) findViewById(R.id.btnLogoutWipe);
         btnLogoutWipe.setOnClickListener(new View.OnClickListener() {

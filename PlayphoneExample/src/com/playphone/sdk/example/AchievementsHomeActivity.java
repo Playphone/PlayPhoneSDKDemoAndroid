@@ -1,12 +1,10 @@
 package com.playphone.sdk.example;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.providers.MNAchievementsProvider.GameAchievementInfo;
-import com.playphone.multinet.providers.MNAchievementsProvider.PlayerAchievementInfo;
 
 import android.content.Intent;
 import android.os.Bundle;

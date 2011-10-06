@@ -1,11 +1,7 @@
 package com.playphone.sdk.example;
 
-import com.playphone.multinet.MNDirect;
-import com.playphone.multinet.MNDirectButton;
-import com.playphone.multinet.MNDirectPopup;
 import com.playphone.multinet.MNDirectUIHelper;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 public class NotImplementedActivity extends CustomTitleActivity {
@@ -16,7 +12,6 @@ public class NotImplementedActivity extends CustomTitleActivity {
         setContentView(R.layout.main);
         
     }
-    
     
     @Override
 	protected void onPause() {

@@ -3,13 +3,7 @@ package com.playphone.sdk.example;
 import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.MNDirectUIHelper;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
 public class CurrentUserInfoActivity extends CustomTitleActivity{

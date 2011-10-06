@@ -37,7 +37,7 @@ public class LeaderboardsDetailsActivity extends CustomTitleActivity implements 
 		txtBreadCrumbs.setText("Home > Leaderboards > Details");
 				
 		
-		LinearLayout layout = (LinearLayout) findViewById(R.id.layoutLeaderboards);
+		// LinearLayout layout = (LinearLayout) findViewById(R.id.layoutLeaderboards);
 		
 		
 		// get intent and set the gamesetid
@@ -105,6 +105,7 @@ public class LeaderboardsDetailsActivity extends CustomTitleActivity implements 
 		    // MNWSRequestContent.addCurrUserLeaderboard call
 		    // "leaderboard" requests return data as a list of MNWSLeaderboardListItem objects, so
 		    // it is safe to cast explicit result of this call to List<MNWSLeaderboardListItem>
+		    @SuppressWarnings("unchecked")
 		    List<MNWSLeaderboardListItem> leaderboard = (List<MNWSLeaderboardListItem>)response.getDataForBlock(blockName);
 		 
 		    // Iterate over the returned list and print the name of the player and his/her highest score

@@ -13,7 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.playphone.multinet.MNDirect;
-import com.playphone.multinet.providers.MNVItemsProvider.GameVItemInfo;
 import com.playphone.multinet.providers.MNVShopProvider.VShopPackInfo;
 
 public class VShopPacksListActivity extends CustomTitleActivity {

@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,8 +22,6 @@ import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.MNDirectUIHelper;
 import com.playphone.multinet.providers.MNVShopProvider;
 import com.playphone.multinet.providers.MNVShopProvider.VShopPackInfo;
-import com.playphone.multinet.providers.MNVShopProvider.IEventHandler.CheckoutVShopPackFailInfo;
-import com.playphone.multinet.providers.MNVShopProvider.IEventHandler.CheckoutVShopPackSuccessInfo;
 
 public class BuyVShopPacksActivity extends CustomTitleActivity implements OnClickListener,Callback {
 	
@@ -48,7 +45,7 @@ public class BuyVShopPacksActivity extends CustomTitleActivity implements OnClic
 		txtBreadCrumbs.setText("Home > Virtual Economy > Store > Buy VShop Packs");
 				
 		List<VShopPackInfo> vShopPacks = Arrays.asList(MNDirect.getVShopProvider().getVShopPackList());
-		LinearLayout layout = (LinearLayout) findViewById(R.id.virtualItemListLayout);
+		// LinearLayout layout = (LinearLayout) findViewById(R.id.virtualItemListLayout);
 		
 		
 		// for each item add create a map of string and item

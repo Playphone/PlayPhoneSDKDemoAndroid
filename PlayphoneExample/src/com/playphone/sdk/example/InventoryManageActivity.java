@@ -15,7 +15,6 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,10 +22,8 @@ import android.widget.Toast;
 import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.providers.MNVItemsProvider;
 import com.playphone.multinet.providers.MNVItemsProvider.GameVItemInfo;
-import com.playphone.multinet.providers.MNVItemsProvider.PlayerVItemInfo;
 import com.playphone.multinet.providers.MNVItemsProvider.TransactionError;
 import com.playphone.multinet.providers.MNVItemsProvider.TransactionInfo;
-import com.playphone.multinet.providers.MNVShopProvider.VShopPackInfo;
 
 public class InventoryManageActivity extends CustomTitleActivity implements OnClickListener, Callback {
 

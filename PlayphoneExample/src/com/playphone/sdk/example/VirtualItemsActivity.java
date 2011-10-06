@@ -5,16 +5,12 @@ import com.playphone.multinet.MNDirectUIHelper;
 import com.playphone.multinet.providers.MNVShopProvider;
 import com.playphone.multinet.providers.MNVShopProvider.VShopPackInfo;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 

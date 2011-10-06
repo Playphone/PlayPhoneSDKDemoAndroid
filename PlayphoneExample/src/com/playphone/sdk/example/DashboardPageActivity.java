@@ -1,10 +1,8 @@
 package com.playphone.sdk.example;
 
 import com.playphone.multinet.MNDirectButton;
-import com.playphone.multinet.MNDirectPopup;
 import com.playphone.multinet.MNDirectUIHelper;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;

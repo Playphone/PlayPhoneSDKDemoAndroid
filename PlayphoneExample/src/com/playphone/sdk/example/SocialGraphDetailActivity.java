@@ -4,11 +4,6 @@ import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.playphone.multinet.MNDirect;
-import com.playphone.multinet.core.ws.MNWSRequestContent;
-import com.playphone.multinet.core.ws.MNWSRequestSender;
-import com.playphone.sdk.example.SocialGraphActivity.MyBuddyListResponseHandler;
-
 public class SocialGraphDetailActivity extends CustomTitleActivity {
 
 	@Override

@@ -1,12 +1,7 @@
 package com.playphone.sdk.example;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
-import javax.net.ssl.HandshakeCompletedListener;
-
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,12 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.os.*;
 
 import com.playphone.multinet.MNDirect;
-import com.playphone.multinet.MNDirectUIHelper;
-import com.playphone.multinet.providers.MNAchievementsProvider.GameAchievementInfo;
-import com.playphone.multinet.providers.MNAchievementsProvider.PlayerAchievementInfo;
 import com.playphone.multinet.providers.MNGameCookiesProvider.IEventHandler;
 
 public class PostCloudStorageActivity extends CustomTitleActivity implements OnClickListener, Handler.Callback{

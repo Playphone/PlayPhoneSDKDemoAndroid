@@ -2,15 +2,6 @@ package com.playphone.sdk.example;
 
 import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.MNDirectUIHelper;
-import com.playphone.multinet.MNErrorInfo;
-import com.playphone.multinet.MNGameParams;
-import com.playphone.multinet.MNUserInfo;
-import com.playphone.multinet.core.IMNSessionEventHandler;
-import com.playphone.multinet.core.MNAppHostCallInfo;
-import com.playphone.multinet.core.MNChatMessage;
-import com.playphone.multinet.core.MNCurrGameResults;
-import com.playphone.multinet.core.MNGameResult;
-import com.playphone.multinet.core.MNJoinRoomInvitationParams;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,9 +21,6 @@ public class LoginUserActivity extends CustomTitleActivity implements Callback {
 	private TextView txtPlayerStatus;
 	private TextView txtPlayerName;
 	Handler handler = new Handler(this);
-	
-	
-	
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -118,6 +106,4 @@ public class LoginUserActivity extends CustomTitleActivity implements Callback {
 			updatePlayerStatus(msg.getData().getInt("statusChange"));
 		return false;
 	}
-	
-	
 }

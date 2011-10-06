@@ -1,7 +1,6 @@
 package com.playphone.sdk.example;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,6 @@ import com.playphone.multinet.core.ws.MNWSRequestError;
 import com.playphone.multinet.core.ws.MNWSRequestSender;
 import com.playphone.multinet.core.ws.MNWSResponse;
 import com.playphone.multinet.core.ws.data.MNWSBuddyListItem;
-import com.playphone.multinet.providers.MNVItemsProvider.GameVItemInfo;
 
 public class SocialGraphActivity extends CustomTitleActivity implements Callback {
 	
@@ -114,6 +112,7 @@ public class SocialGraphActivity extends CustomTitleActivity implements Callback
 	    // MNWSRequestContent.addCurrUserBuddyList call
 	    // the "friend list" request returns data as a List of MNWSBuddyListItem objects, so
 	    // it is safe to explicitly cast the result of this call to List<MNWSBuddyListItem>
+	    @SuppressWarnings("unchecked")
 	    List<MNWSBuddyListItem> friends = (List<MNWSBuddyListItem>)response.getDataForBlock(blockName);
 	    
 	    Log.d("playphone","Size of friends list: " + String.valueOf(friends.size()));

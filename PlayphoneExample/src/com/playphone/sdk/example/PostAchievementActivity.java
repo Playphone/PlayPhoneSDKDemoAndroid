@@ -3,7 +3,6 @@ package com.playphone.sdk.example;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +18,6 @@ import android.widget.Toast;
 import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.MNDirectUIHelper;
 import com.playphone.multinet.providers.MNAchievementsProvider.GameAchievementInfo;
-import com.playphone.multinet.providers.MNAchievementsProvider.PlayerAchievementInfo;
 
 public class PostAchievementActivity extends CustomTitleActivity implements OnClickListener{
 	EditText editInput;

@@ -1,20 +1,15 @@
 package com.playphone.sdk.example;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.playphone.multinet.MNDirect;
-import com.playphone.multinet.providers.MNVItemsProvider.GameVItemInfo;
 
 public class LeaderboardHome extends CustomTitleActivity {
 	@Override
