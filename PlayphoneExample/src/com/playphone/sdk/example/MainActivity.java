@@ -22,7 +22,6 @@ public class MainActivity extends ListActivity {
 
 	// application specific information
 	private int _GAMEID = MyPlayphoneCredentials._GAMEID;
-	private String _APISECRET = MyPlayphoneCredentials._APISECRET;
 	private static MNEventHandler eventHandler = null;
 	private String TAB = "       ";
 	
@@ -187,8 +186,11 @@ public class MainActivity extends ListActivity {
 		});
 		
 		eventHandler = new MNEventHandler();
-		MNDirect.init(this._GAMEID, this._APISECRET,
-			eventHandler, this);
+		MNDirect.init(this._GAMEID, MNDirect.makeGameSecretByComponents(
+				MyPlayphoneCredentials._APISECRET1,
+				MyPlayphoneCredentials._APISECRET2,
+				MyPlayphoneCredentials._APISECRET3,
+				MyPlayphoneCredentials._APISECRET4), eventHandler, this);
 		MNDirect.handleApplicationIntent(getIntent());
 		MNDirectButton.initWithLocation(MNDirectButton.MNDIRECTBUTTON_TOPLEFT);
 		MNDirectPopup.init(MNDirectPopup.MNDIRECTPOPUP_ALL);
