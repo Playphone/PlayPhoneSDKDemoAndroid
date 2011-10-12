@@ -50,10 +50,6 @@ public class MainActivity extends ListActivity {
                     @Override public String toString() { return TAB + "Virtual Economy"; }
                     @Override public void run() 	{ startActivity(new Intent(MainActivity.this, VirtualEconomyListActivity.class));}
                 },
-				new Entry() {
-					@Override public String toString() { return TAB + "Application info"; }
-					@Override public void run()        { startActivity(new Intent(MainActivity.this, ApplicationInfoActivity.class));}
-				},
                 new Entry() {
 					@Override public String toString() { return "2. Advanced Features"; }
 					@Override public void run()        { }
@@ -99,7 +95,7 @@ public class MainActivity extends ListActivity {
 						MNDirectUIHelper.showDashboard();
 						Toast.makeText(MainActivity.this, "Click \"Play Now\" to join a multiplayer room and send messages", Toast.LENGTH_LONG).show();}
 														
-				}
+				},
 				/*
 				new Entry() {
 					@Override public String toString() { return "Dashboard"; }
@@ -165,6 +161,10 @@ public class MainActivity extends ListActivity {
 					@Override public String toString() { return "Logout from Playphone"; }
 					@Override public void run()        { startActivity(new Intent(MainActivity.this, LogoutActivity.class));}
 				}*/
+				new Entry() {
+					@Override public String toString() { return TAB + "Application info"; }
+					@Override public void run()        { startActivity(new Intent(MainActivity.this, ApplicationInfoActivity.class));}
+				}
 		};
 	}
 

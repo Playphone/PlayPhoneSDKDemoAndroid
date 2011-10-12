@@ -22,11 +22,8 @@ public class ApplicationInfoActivity extends CustomTitleActivity {
         
         appInfoText = (TextView) findViewById(R.id.appinfotext);
         
-        
-        
-        StringBuffer resultInfo = new StringBuffer();
-        
         PackageManager pm = getPackageManager();
+        StringBuffer resultInfo = new StringBuffer();
         
         resultInfo.append("Application  name : ").append(pm.getApplicationLabel(getApplicationInfo())).append("\n");
         
@@ -39,7 +36,9 @@ public class ApplicationInfoActivity extends CustomTitleActivity {
 		}
 		
         resultInfo.append("MN SDK version :  ").append(MNSession.CLIENT_API_VERSION.replace('_', '.')).append("\n");
-        resultInfo.append("Android library version :  ").append(getApplicationInfo().targetSdkVersion).append("\n");        resultInfo.append("Web front url   : ").append(MNDirect.getSession().getPlatform().getMultiNetConfigURL()).append("\n");
+        resultInfo.append("Android library version :  ").append(getApplicationInfo().targetSdkVersion).append("\n");
+        resultInfo.append("Configuration url : ").append("\n");
+        resultInfo.append(MNDirect.getSession().getPlatform().getMultiNetConfigURL()).append("\n");
         
         appInfoText.setText(resultInfo.toString());
 	}
