@@ -13,6 +13,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 public class CustomTitleActivity extends Activity{
+	private boolean titleAttached = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +25,12 @@ public class CustomTitleActivity extends Activity{
 	@Override
 	protected void onStart() {
 		super.onStart();
+		
+		if (titleAttached) {
+			return;
+		}
+		titleAttached = true;
+		
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 		
 		Button btnHome = (Button) findViewById(R.id.btnHome);
