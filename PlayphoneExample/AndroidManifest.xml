@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.playphone.sdk.example"
       android:versionCode="104052"
-      android:versionName="1.4.2.RC2">
+      android:versionName="1.4.5.RC2">
     <uses-sdk android:minSdkVersion="7"  android:targetSdkVersion="8"/>
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
@@ -83,6 +83,8 @@
         <activity android:theme="@style/CustomTheme" android:name=".AchievementsHomeActivity"
               android:configChanges="orientation|keyboard|keyboardHidden"/>
         <activity android:theme="@style/CustomTheme" android:name=".SocialGraphDetailActivity"
+              android:configChanges="orientation|keyboard|keyboardHidden"/>
+        <activity android:theme="@style/CustomTheme" android:name=".ApplicationInfoActivity"
               android:configChanges="orientation|keyboard|keyboardHidden"/>
         <receiver android:name="com.playphone.multinet.core.MNInstallReferrerReceiver"
           android:exported="true">
