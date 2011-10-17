@@ -94,6 +94,17 @@
     		</intent-filter>
 		</receiver>
         
+	<!-- Billing service -->
+			<service
+				android:name="com.playphone.multinet.core.inappbilling.MNInAppBillingService" />
+			<receiver
+				android:name="com.playphone.multinet.core.inappbilling.MNInAppBillingReceiver">
+				<intent-filter>
+					<action android:name="com.android.vending.billing.RESPONSE_CODE" />
+					<action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
+					<action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
+				</intent-filter>
+			</receiver>
 
     </application>
 </manifest>
