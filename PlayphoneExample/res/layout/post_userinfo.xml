@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:id="@+id/relativeLayout1" android:layout_height="match_parent">
         <include layout="@layout/breadcrumbs" android:layout_width="match_parent" android:id="@+id/incBreadCrumbs" android:layout_height="wrap_content" android:layout_alignParentTop="true"></include>
-        <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:id="@+id/textView1" android:text="Details for the current user" android:layout_alignParentLeft="true" android:layout_width="match_parent" android:layout_below="@id/incBreadCrumbs"></TextView>
-        <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/txtResult" android:layout_below="@id/textView1" android:layout_alignParentLeft="true" android:layout_marginTop="20dp" android:layout_width="match_parent"></TextView>
+        <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_alignParentLeft="true" android:layout_width="match_parent" android:layout_below="@id/incBreadCrumbs" android:text="Information title" android:id="@+id/infoTitle"></TextView>
+        <ImageView android:layout_height="64dp" android:layout_width="64dp" android:layout_marginLeft="50dp" android:layout_marginTop="10dp" android:layout_marginBottom="10dp" android:id="@+id/avatarImage" android:layout_below="@+id/infoTitle" android:scaleType="fitXY"></ImageView>
+        <TableLayout android:layout_below="@+id/avatarImage" android:orientation="vertical" android:layout_width="match_parent" android:layout_margin="5dp" android:layout_height="wrap_content" android:stretchColumns="0" android:id="@+id/infoTable">
+        </TableLayout>
     </RelativeLayout>
-    
