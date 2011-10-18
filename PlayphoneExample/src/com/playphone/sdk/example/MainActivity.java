@@ -162,7 +162,7 @@ public class MainActivity extends ListActivity {
 					@Override public void run()        { startActivity(new Intent(MainActivity.this, LogoutActivity.class));}
 				}*/
 				new Entry() {
-					@Override public String toString() { return TAB + "Application info"; }
+					@Override public String toString() { return TAB + "Application Info"; }
 					@Override public void run()        { startActivity(new Intent(MainActivity.this, ApplicationInfoActivity.class));}
 				}
 		};

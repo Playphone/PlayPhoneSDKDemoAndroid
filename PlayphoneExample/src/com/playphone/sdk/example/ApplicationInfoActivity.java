@@ -20,6 +20,9 @@ public class ApplicationInfoActivity extends CustomTitleActivity {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.application_info);
         
+		TextView txtBreadCrumbs = (TextView) findViewById(R.id.txtBreadCrumbs);
+		txtBreadCrumbs.setText("Home > Application Info");
+        
         appInfoText = (TextView) findViewById(R.id.appinfotext);
         
         PackageManager pm = getPackageManager();

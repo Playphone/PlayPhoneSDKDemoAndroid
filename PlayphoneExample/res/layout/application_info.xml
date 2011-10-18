@@ -4,6 +4,7 @@
   android:orientation="vertical"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
-    <TextView android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/appinfotext"></TextView>
+    <include layout="@layout/breadcrumbs" android:layout_height="wrap_content" android:layout_width="fill_parent" android:id="@+id/incBreadCrumbs"></include>
+    <TextView android:layout_width="match_parent" android:id="@+id/appinfotext" android:layout_height="wrap_content" android:layout_alignParentLeft="true" android:layout_below="@+id/incBreadCrumbs"></TextView>
     
 </RelativeLayout>
