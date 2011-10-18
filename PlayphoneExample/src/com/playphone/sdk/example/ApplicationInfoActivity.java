@@ -18,7 +18,7 @@ public class ApplicationInfoActivity extends CustomTitleActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.applicationinfo);
+        setContentView(R.layout.application_info);
         
         appInfoText = (TextView) findViewById(R.id.appinfotext);
         
