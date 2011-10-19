@@ -19,5 +19,5 @@
     <string name="inventory_list">Inventory List</string>
     <string name="manage_inventory">Manage Inventory</string>
     <string name="details_current_user">Details for the current user</string>
-    <string name="friend_details">Details for the friend</string>
+    <string name="friend_details">Buddy details</string>
 </resources>

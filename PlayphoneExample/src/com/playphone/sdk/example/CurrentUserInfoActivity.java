@@ -68,7 +68,6 @@ public class CurrentUserInfoActivity extends CustomTitleActivity {
 
 		cell = new TextView(this);
 		cell.setText(description);
-		cell.setGravity(Gravity.RIGHT);
 		tr.addView(cell);
 
 		infoTable.addView(tr);

@@ -81,10 +81,19 @@ public class SocialGraphActivity extends CustomTitleActivity implements Callback
 					//generate the intent for the friend details and pass in the item id
 					Intent intent = new Intent(SocialGraphActivity.this,SocialGraphDetailActivity.class);
 					intent.putExtra("social", "yes");
+					
+					intent.putExtra("avatarurl",buddies.get(currentFriend).getFriendUserAvatarUrl());
+										
 					intent.putExtra("username", currentFriend);
 					intent.putExtra("userid",buddies.get(currentFriend).getFriendUserId());
-					intent.putExtra("locale",buddies.get(currentFriend).getFriendUserLocale());
 					intent.putExtra("online",buddies.get(currentFriend).getFriendUserOnlineNow());
+					intent.putExtra("ingame",buddies.get(currentFriend).getFriendInGameName());
+					intent.putExtra("hascurrentgame",buddies.get(currentFriend).getFriendHasCurrentGame());
+					intent.putExtra("locale",buddies.get(currentFriend).getFriendUserLocale());
+					intent.putExtra("isignored",buddies.get(currentFriend).getFriendIsIgnored());
+					intent.putExtra("curroom",buddies.get(currentFriend).getFriendInGameId());
+					intent.putExtra("ingameachievements",buddies.get(currentFriend).getFriendCurrGameAchievementsList());
+					
 					startActivity(intent);
 				}
 			});
