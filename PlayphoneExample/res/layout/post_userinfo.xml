@@ -1,8 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:id="@+id/relativeLayout1" android:layout_height="match_parent">
-        <include layout="@layout/breadcrumbs" android:layout_width="match_parent" android:id="@+id/incBreadCrumbs" android:layout_height="wrap_content" android:layout_alignParentTop="true"></include>
-        <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:layout_alignParentLeft="true" android:layout_width="match_parent" android:layout_below="@id/incBreadCrumbs" android:text="Information title" android:id="@+id/infoTitle"></TextView>
-        <ImageView android:layout_marginTop="10dp" android:layout_marginBottom="10dp" android:id="@+id/avatarImage" android:layout_below="@+id/infoTitle" android:scaleType="fitXY" android:layout_marginLeft="30dp" android:layout_height="80dp" android:layout_width="80dp"></ImageView>
-        <TableLayout android:layout_below="@+id/avatarImage" android:orientation="vertical" android:layout_width="match_parent" android:layout_margin="5dp" android:layout_height="wrap_content" android:id="@+id/infoTable">
-        </TableLayout>
-    </RelativeLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/relativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <include
+        android:id="@+id/incBreadCrumbs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        layout="@layout/breadcrumbs" >
+    </include>
+
+    <TextView
+        android:id="@+id/infoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/incBreadCrumbs"
+        android:text="Information title"
+        android:textAppearance="?android:attr/textAppearanceMedium" >
+    </TextView>
+
+    <ImageView
+        android:id="@+id/avatarImage"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@+id/infoTitle"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:scaleType="fitXY" >
+    </ImageView>
+
+    <TableLayout
+        android:id="@+id/infoTable"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/avatarImage"
+        android:layout_margin="5dp"
+        android:orientation="vertical" >
+    </TableLayout>
+
+</RelativeLayout>

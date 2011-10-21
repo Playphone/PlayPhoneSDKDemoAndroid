@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" 
-    style="@style/customtheme_title">
+    android:layout_height="match_parent" >
 
     <include
         android:id="@+id/incBreadCrumbs"
@@ -16,6 +15,8 @@
         android:id="@android:id/list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:drawSelectorOnTop="false" android:layout_below="@id/incBreadCrumbs">
+        android:layout_below="@id/incBreadCrumbs"
+        android:drawSelectorOnTop="false" >
     </ListView>
+
 </RelativeLayout>
