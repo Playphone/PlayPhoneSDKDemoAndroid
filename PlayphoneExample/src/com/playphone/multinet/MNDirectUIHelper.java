@@ -38,16 +38,41 @@ public class MNDirectUIHelper {
 	 * This is default 
 	 * Call before show Dashboard
 	 */
-	public static void setDashboardNewStyle() {
+	protected static void setDashboardNewStyle() {
 		edgePopupDashboardFlag  = true; 
 		fullScreenDashboardFlag = false; 
 	}
 	/**
 	 * Call before show Dashboard
 	 */
-	public static void setDashboardOldStyle() {
+	protected static void setDashboardOldStyle() {
 		edgePopupDashboardFlag  = false; 
 		fullScreenDashboardFlag = true; 
+	}
+	
+	public static final int DASHBOARD_STYLE_FULLSCREEN = 1;
+	public static final int DASHBOARD_STYLE_POPUP      = 2;
+
+	public static void setDashboardStyle(int newStyle) {
+		if (newStyle == DASHBOARD_STYLE_POPUP)
+		{
+			setDashboardNewStyle();
+		}
+		else
+		{
+			setDashboardOldStyle();
+		}
+	}
+	
+	public static int getDashboardStyle() {
+		if (fullScreenDashboardFlag)
+		{
+			return(DASHBOARD_STYLE_FULLSCREEN);
+		}
+		else
+		{
+			return(DASHBOARD_STYLE_POPUP);
+		}
 	}
 	
 	public static interface IEventHandler {

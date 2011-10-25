@@ -257,7 +257,11 @@ public class MNInfoPanelNetwork {
 		binderViewRef.get().post(new Runnable() {
 			@Override
 			public void run() {
-				Helper.bindTo((ViewGroup) binderViewRef.get());
+				ViewGroup vg = (ViewGroup) binderViewRef.get();
+				if (vg != null) {
+					Helper.bindTo(vg);
+					vg = null;
+				}
 			}
 		});
 	}
