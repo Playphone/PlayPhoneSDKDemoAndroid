@@ -9,6 +9,8 @@ import com.playphone.multinet.providers.MNGameSettingsProvider.GameSettingInfo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +20,11 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class GameSettingActivity extends CustomTitleListActivity {
+public class GameSettingActivity extends CustomTitleListActivity implements
+		Handler.Callback {
 	private ArrayList<MNGameSettingsProvider.GameSettingInfo> gameSettingsArray = new ArrayList<MNGameSettingsProvider.GameSettingInfo>();
 	private ArrayAdapter<MNGameSettingsProvider.GameSettingInfo> aa = null;
+	Handler handler = new Handler(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,12 +78,12 @@ public class GameSettingActivity extends CustomTitleListActivity {
 
 				Intent intent = new Intent(GameSettingActivity.this,
 						GameSettingDetailActivity.class);
-				intent.putExtra("gamesetting",true);
+				intent.putExtra("gamesetting", true);
 				intent.putExtra("id", gsi.getId());
 				intent.putExtra("name", gsi.getName());
 				intent.putExtra("params", gsi.getParams());
 				intent.putExtra("sysparams", gsi.getSysParams());
-				
+
 				startActivity(intent);
 			}
 		});
@@ -95,7 +99,7 @@ public class GameSettingActivity extends CustomTitleListActivity {
 		}
 		aa.notifyDataSetChanged();
 	}
-	
+
 	@Override
 	protected void onResume() {
 		MNDirect.getGameSettingsProvider().addEventHandler(gsEventHandler);
@@ -113,7 +117,19 @@ public class GameSettingActivity extends CustomTitleListActivity {
 	MNGameSettingsProvider.IEventHandler gsEventHandler = new MNGameSettingsProvider.IEventHandler() {
 		@Override
 		public void onGameSettingListUpdated() {
-			onDataUpdated();
+			handler.sendEmptyMessage(ON_UPDATE_EVENT);
 		}
 	};
+
+	private static final int ON_UPDATE_EVENT = 1;
+
+	@Override
+	public boolean handleMessage(Message msg) {
+		if (msg.what == ON_UPDATE_EVENT) {
+			onDataUpdated();
+			return true;
+		}
+
+		return false;
+	}
 }
