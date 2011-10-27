@@ -9,9 +9,6 @@ package com.playphone.multinet.core;
 
 import android.content.Context;
 import android.webkit.WebView;
-import android.webkit.WebSettings;
-import android.webkit.WebChromeClient;
-import android.webkit.WebViewClient;
 import android.view.View;
 import android.view.ViewGroup;
 import android.util.Log;

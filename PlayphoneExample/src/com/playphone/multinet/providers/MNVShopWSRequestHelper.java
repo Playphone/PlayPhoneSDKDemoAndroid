@@ -14,7 +14,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import com.playphone.multinet.core.MNSession;
 import com.playphone.multinet.core.MNUtils;
@@ -90,8 +89,6 @@ class MNVShopWSRequestHelper
 
   private void processFinishTransactionCmd (Element cmdElement)
    {
-    String transactionIdStr = null;
-
     Element currElement = MNWSXmlTools.nodeGetFirstChildElement(cmdElement);
 
     if (currElement.getTagName().equals("srcTransactionId"))

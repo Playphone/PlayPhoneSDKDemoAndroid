@@ -196,7 +196,7 @@ public class MNGameCookiesProvider
        }
 
       int key           = 0;
-      int requestNumber;
+      int requestNumber = 0;
 
       try
        {
@@ -204,6 +204,11 @@ public class MNGameCookiesProvider
         requestNumber = Integer.parseInt(responseComponents[1]);
        }
       catch (NumberFormatException e)
+       {
+        return;
+       }
+
+      if (requestNumber != REQUEST_NUMBER_API)
        {
         return;
        }

@@ -35,6 +35,8 @@ public class MNAchievementsProvider
  {
   public static final String PROVIDER_NAME = "com.playphone.mn.at";
 
+  public static final int ACHIEVEMENT_IS_SECRET_MASK = 0x0001;
+
   /**
    * Interface handling achievements events.
    */

@@ -13,7 +13,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import com.playphone.multinet.core.MNURLDownloader;
 import com.playphone.multinet.core.MNURLStringDownloader;
@@ -33,6 +32,7 @@ import com.playphone.multinet.core.ws.data.MNWSCurrentUserInfo;
 import com.playphone.multinet.core.ws.data.MNWSRoomListItem;
 import com.playphone.multinet.core.ws.data.MNWSRoomUserInfoItem;
 import com.playphone.multinet.core.ws.data.MNWSUserGameCookie;
+import com.playphone.multinet.core.ws.data.MNWSSystemGameNetStats;
 
 public class MNWSRequestSender
  {
@@ -57,7 +57,7 @@ public class MNWSRequestSender
 
   private IMNWSRequest sendWSRequest (MNWSRequestContent content, IMNWSRequestEventHandler eventHandler, boolean authorized)
    {
-    String webServerUrl = session.getWebServerURL();
+    String webServerUrl = session != null ? session.getWebServerURL() : null;
 
     if (webServerUrl == null)
      {
@@ -230,6 +230,11 @@ public class MNWSRequestSender
     private HashMap<String,String>   nameMapping;
    }
 
+  public void registerParser (String blockName, IMNWSXmlDataParser parser)
+   {
+    parsers.put(blockName,parser);
+   }
+
   private void setupStdParsers ()
    {
     MNWSXmlGenericItemListParser buddyListParser =
@@ -330,7 +335,15 @@ public class MNWSRequestSender
                           return new MNWSUserGameCookie();
                          }
                        }));
-    }
+    parsers.put("systemGameNetStats",
+                 new MNWSXmlGenericItemParser()
+                  {
+                   public MNWSGenericItem createNewItem ()
+                    {
+                     return new MNWSSystemGameNetStats();
+                    }
+                  });
+   }
 
   private MNSession                          session;
   private HashMap<String,IMNWSXmlDataParser> parsers;

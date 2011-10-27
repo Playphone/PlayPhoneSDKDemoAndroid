@@ -105,7 +105,13 @@ public class MNInAppBillingService extends Service implements ServiceConnection
 
   private void unbindMarketService ()
    {
-    unbindService(this);
+    try
+     {
+      unbindService(this);
+     }
+    catch (Exception e)
+     {
+     }
    }
 
   public void onServiceConnected (ComponentName name, IBinder service)

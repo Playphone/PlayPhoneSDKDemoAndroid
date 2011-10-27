@@ -68,6 +68,11 @@ public class MNWSRequestContent
     mapping.put(blockName,parserName);
    }
 
+  public String addSystemGameNetStats ()
+   {
+    return addInfoBlock("systemGameNetStats");
+   }
+
   public String addCurrentUserInfo ()
    {
     return addInfoBlock("currentUser");

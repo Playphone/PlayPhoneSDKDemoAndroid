@@ -8,6 +8,12 @@
 package com.playphone.multinet.providers;
 
 import java.util.HashSet;
+import java.util.HashMap;
+
+import it.gotoandplay.smartfoxclient.SmartFoxClient;
+import it.gotoandplay.smartfoxclient.data.Room;
+import it.gotoandplay.smartfoxclient.data.SFSVariable;
+import it.gotoandplay.smartfoxclient.data.RoomVariableRequest;
 
 import com.playphone.multinet.core.MNSession;
 import com.playphone.multinet.core.MNSessionEventHandlerAbstract;
@@ -63,6 +69,56 @@ public class MNClientRobotsProvider
    {
     sessionEventHandler.session.sendPluginMessage
      (PROVIDER_NAME,String.format("robotScore:%d:%d",userInfo.userSFId,score));
+   }
+
+  /**
+   * Requests a server to maintain the particular number of robots in
+   * current game room
+   * @param robotCount number of robots server should maintain
+   */
+  public void setRoomRobotLimit (int robotCount)
+   {
+    SmartFoxClient smartFox = sessionEventHandler.session.getSmartFox();
+
+    HashMap<String,RoomVariableRequest> vars = new HashMap<String,RoomVariableRequest>();
+
+    RoomVariableRequest varRequest =
+     new RoomVariableRequest(Integer.toString(robotCount),
+                             SFSVariable.TYPE_STRING,
+                             false,true);
+
+    vars.put(ROBOT_ROOM_LIMIT_VARNAME,varRequest);
+
+    smartFox.setRoomVariables(vars,smartFox.activeRoomId);
+   }
+
+  /**
+   * Returns a number of robots server was asked to maintain in current
+   * game room
+   * @return number of robots server should maintain
+   */
+  public int getRoomRobotLimit ()
+   {
+    int  result     = 0;
+    Room activeRoom = sessionEventHandler.session.getSmartFox().getActiveRoom();
+
+    if (activeRoom != null)
+     {
+      SFSVariable var = activeRoom.getVariable(ROBOT_ROOM_LIMIT_VARNAME);
+
+      if (var != null && var.getType().equals(SFSVariable.TYPE_STRING))
+       {
+        try
+         {
+          result = Integer.parseInt(var.getValue());
+         }
+        catch (NumberFormatException e)
+         {
+         }
+       }
+     }
+
+    return result;
    }
 
   private static class SessionEventHandler extends MNSessionEventHandlerAbstract
@@ -137,6 +193,8 @@ public class MNClientRobotsProvider
     private static final String IROBOT_MESSAGE_PREFIX = "irobot:";
     private static final int    IROBOT_MESSAGE_PREFIX_LEN = IROBOT_MESSAGE_PREFIX.length();
    }
+
+  private static final String ROBOT_ROOM_LIMIT_VARNAME = "MN_robot_limit";
 
   private SessionEventHandler sessionEventHandler;
  }

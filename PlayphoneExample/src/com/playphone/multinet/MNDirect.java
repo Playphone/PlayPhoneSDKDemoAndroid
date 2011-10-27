@@ -28,6 +28,7 @@ import com.playphone.multinet.providers.MNScoreProgressProvider;
 import com.playphone.multinet.providers.MNVItemsProvider;
 import com.playphone.multinet.providers.MNVShopProvider;
 import com.playphone.multinet.providers.MNGameSettingsProvider;
+import com.playphone.multinet.providers.MNServerInfoProvider;
 
 /**
  * A class representing MultiNet "Direct" API.
@@ -448,6 +449,16 @@ public class MNDirect
     return gameSettingsProvider;
    }
 
+  /**
+   * Returns server info provider instance.
+   *
+   * @return <code>MNServerInfoProvider</code> object
+   */
+  public static MNServerInfoProvider getServerInfoProvider ()
+   {
+    return serverInfoProvider;
+   }
+
   private static class SessionEventHandler
                  extends MNSessionEventHandlerAbstract
                  implements IMNUserProfileViewEventHandler
@@ -616,6 +627,7 @@ public class MNDirect
     vItemsProvider          = new MNVItemsProvider(session);
     vShopProvider           = new MNVShopProvider(session,vItemsProvider);
     gameSettingsProvider    = new MNGameSettingsProvider(session);
+    serverInfoProvider      = new MNServerInfoProvider(session);
    }
 
   private static void releaseProviders ()
@@ -665,6 +677,11 @@ public class MNDirect
       gameSettingsProvider.shutdown(); gameSettingsProvider = null;
      }
 
+    if (serverInfoProvider != null)
+     {
+      serverInfoProvider.shutdown(); serverInfoProvider = null;
+     }
+
     scoreProgressProvider = null;
    }
 
@@ -682,5 +699,6 @@ public class MNDirect
   private static MNVItemsProvider          vItemsProvider;
   private static MNVShopProvider           vShopProvider;
   private static MNGameSettingsProvider    gameSettingsProvider;
+  private static MNServerInfoProvider      serverInfoProvider;
  }
 

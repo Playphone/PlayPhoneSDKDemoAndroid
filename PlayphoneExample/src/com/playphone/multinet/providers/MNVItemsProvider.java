@@ -35,10 +35,10 @@ public class MNVItemsProvider
  {
   public static final int TRANSACTION_ID_UNDEFINED = 0;
 
-  public static final int VITEM_IS_CURRENCY     = 0x0001;
-  public static final int VITEM_IS_UNIQUE       = 0x0002;
-  public static final int VITEM_IS_CONSUMABLE   = 0x0004;
-  public static final int VITEM_ISSUE_ON_CLIENT = 0x0200;
+  public static final int VITEM_IS_CURRENCY_MASK     = 0x0001;
+  public static final int VITEM_IS_UNIQUE_MASK       = 0x0002;
+  public static final int VITEM_IS_CONSUMABLE_MASK   = 0x0004;
+  public static final int VITEM_ISSUE_ON_CLIENT_MASK = 0x0200;
 
   /**
    * Interface handling virtual items events.
@@ -1062,11 +1062,6 @@ public class MNVItemsProvider
      }
    }
 
-  private static String getVItemsDataUrl (String webServerUrl, MNSession session)
-   {
-    return webServerUrl + String.format(VITEMS_DATA_URL_FORMAT,session.getGameId(),MNSession.CLIENT_API_VERSION);
-   }
-
   private long generateInitialClientTransactionId ()
    {
     return System.currentTimeMillis();
@@ -1129,7 +1124,6 @@ public class MNVItemsProvider
 
   private static final int    MESSAGE_CMD_PREFIX_LEN  = 1;
   private static final String PROVIDER_NAME           = "com.playphone.mn.vi";
-  private static final String VITEMS_DATA_URL_FORMAT  = "/data_game_item_list.php?game_id=%d&api_ver=%s";
   private static final char   MESSAGE_FIELD_SEPARATOR = '\t';
   private static final String DATA_FILE_NAME        = "MNVItemsProvider.xml";
   private static final String[] GameVItemEntriesXmlPath = { "GameVocabulary", "MNVItemsProvider", "VItems" };

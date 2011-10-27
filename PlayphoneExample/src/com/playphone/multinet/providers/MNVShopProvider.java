@@ -7,27 +7,21 @@
 
 package com.playphone.multinet.providers;
 
-import com.playphone.multinet.MNConst;
 import com.playphone.multinet.core.MNSession;
 import com.playphone.multinet.core.MNUtils;
 import com.playphone.multinet.core.MNSessionEventHandlerAbstract;
 import com.playphone.multinet.core.MNGameVocabulary;
 import com.playphone.multinet.core.MNEventHandlerArray;
-import com.playphone.multinet.core.MNURLDownloader;
-import com.playphone.multinet.core.MNURLStringDownloader;
 import com.playphone.multinet.core.ws.MNWSXmlTools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.io.UnsupportedEncodingException;
-import java.io.StringReader;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import android.app.PendingIntent;
 
@@ -178,6 +172,9 @@ public class MNVShopProvider
    */
   public static class VShopPackInfo
    {
+    public static final int IS_HIDDEN_MASK     = 0x0001;
+    public static final int IS_HOLD_SALES_MASK = 0x0002;
+
     /**
      * Package identifier - unique identifier of shop package.
      */
