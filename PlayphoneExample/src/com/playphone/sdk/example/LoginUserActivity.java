@@ -82,7 +82,8 @@ public class LoginUserActivity extends CustomTitleActivity implements Callback {
 		
 		// set user name
 		txtPlayerName.setText(String.valueOf(MNDirect.getSession().getMyUserId()) + "   " +  MNDirect.getSession().getMyUserName());
-		MNDirectUIHelper.hideDashboard();
+		
+		// MNDirectUIHelper.hideDashboard();
 		// set user status and hide the correct button
 		if(loggedIn)
 		{
