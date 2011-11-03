@@ -211,7 +211,7 @@ public class MNDirectUIHelper {
 	}
 
 	public synchronized static boolean isDashboardVisible() {
-		return (dashboard == null) ? false : dashboard.isVisible();
+		return (dashboard == null) ? false : dashboard.isShowing();
 	}
 
 	protected static class EventHandler extends MNSessionEventHandlerAbstract {
@@ -267,14 +267,22 @@ public class MNDirectUIHelper {
 	}
 
 	protected static class Dashboard extends Dialog {
+		
+		private boolean showNowFlag = false;
+		
+		public boolean isShowing () {
+			return (showNowFlag);
+		}
 
 		static final int PADDING_SIZE = 10;
 
 		public void restoreState() {
 			if (showOnBind) {
+				showNowFlag = true;
 				dashboard.show();
 				onShowDashboard();
 			} else {
+				showNowFlag = false;
 				dashboard.hide();
 				onHideDashboard();
 			}
@@ -357,10 +365,6 @@ public class MNDirectUIHelper {
 					showOnBind = false;
 				}
 			});
-		}
-
-		public boolean isVisible() {
-			return isShowing();
 		}
 	}
 }
