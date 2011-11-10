@@ -11,7 +11,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class LeaderboardHome extends CustomTitleActivity {
+public class LeaderboardHome extends CustomTitleActivity implements
+OnClickListener{
+	
+	private Button gameLbButton;
+	private Button playerLbButton;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -20,10 +25,14 @@ public class LeaderboardHome extends CustomTitleActivity {
 		// set the breadcrumbs text
 		TextView txtBreadCrumbs = (TextView) findViewById(R.id.txtBreadCrumbs);
 		txtBreadCrumbs.setText("Home > Leaderboards");
-				
 		
+		gameLbButton = (Button) findViewById(R.id.game_lb_button);
+		gameLbButton.setOnClickListener(this);
+		
+		playerLbButton = (Button) findViewById(R.id.player_lb_button);
+		playerLbButton.setOnClickListener(this);
+
 		LinearLayout layout = (LinearLayout) findViewById(R.id.layoutLeaderboards);
-		
 		
 		List<String> leaderboards = new ArrayList<String>();
 		leaderboards.add("Default");
@@ -49,9 +58,6 @@ public class LeaderboardHome extends CustomTitleActivity {
 			});
 			layout.addView(btnLeaderboard);
 		}
-		
-		
-		
 	}
 	
 	static int getLeaderboardIdForName(String name){
@@ -61,5 +67,14 @@ public class LeaderboardHome extends CustomTitleActivity {
 		return -1;
 	}
 
-
+	@Override
+	public void onClick(View v) {
+		if (v == gameLbButton) {
+			Intent intent = new Intent(this, GameLeaderBoardActivity.class);
+			startActivity(intent);
+		} else if (v == playerLbButton) {
+			Intent intent = new Intent(this, PlayerLeaderBoardActivity.class);
+			startActivity(intent);
+		}
+	}
 }

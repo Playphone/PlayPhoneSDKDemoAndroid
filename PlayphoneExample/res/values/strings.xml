@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="hello">Not yet implemented!</string>
     <string name="app_name">Playphone SDK Demo</string>
     <!-- Virtual Item pages -->
@@ -20,4 +21,21 @@
     <string name="manage_inventory">Manage Inventory</string>
     <string name="details_current_user">Details for the current user</string>
     <string name="friend_details">Buddy details</string>
+    <string name="game">Game : </string>
+    <string name="game_set">Game set : </string>
+    <string name="game_id">Game id :   </string>
+    <string name="score_posting">Score posting</string>
+    <string name="information_extraction">Information extraction</string>
+    <string name="game_leaderboard">Game leaderboard</string>
+    <string name="player_leaderboard">Player leaderboard</string>
+    <string name="period">Period : </string>
+    <string name="send_request">Send request</string>
+    <string name="player">Player : </string>
+    <string name="current">Current</string>
+    <string name="custom">Custom</string>
+    <string name="all_time">All Time</string>
+    <string name="week">Week</string>
+    <string name="month">Month</string>
+    <string name="player_id">Player id : </string>
+        
 </resources>

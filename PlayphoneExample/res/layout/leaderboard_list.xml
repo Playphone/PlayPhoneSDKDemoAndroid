@@ -1,9 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
-		android:id="@+id/layoutDashboardList"
-		android:layout_width="match_parent" 
-		android:layout_height="match_parent"
-		android:orientation="vertical">
-    <include layout="@layout/breadcrumbs" android:layout_width="match_parent" android:id="@+id/incBreadCrumbs" android:layout_height="wrap_content" android:layout_alignParentTop="true"></include>
-	<LinearLayout android:id="@+id/layoutLeaderboards" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" ></LinearLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutDashboardList"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:id="@+id/incBreadCrumbs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        layout="@layout/breadcrumbs" >
+    </include>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:text="@string/score_posting"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <LinearLayout
+        android:id="@+id/layoutLeaderboards"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:text="@string/information_extraction"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <LinearLayout
+        android:id="@+id/leaderboardsLayout"
+        android:layout_width="match_parent"
+        android:orientation="vertical" android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/game_lb_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/game_leaderboard" />
+
+        <Button
+            android:id="@+id/player_lb_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/player_leaderboard" />
+    </LinearLayout>
+
 </LinearLayout>
