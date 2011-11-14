@@ -161,10 +161,11 @@ public class MainActivity extends ListActivity {
                     									MNDirectUIHelper.showDashboard();
 														Toast.makeText(MainActivity.this, "Click \"Play Now\" to join a multiplayer room and send messages", Toast.LENGTH_LONG).show();}
                 },
+                */
 				new Entry() {
-					@Override public String toString() { return "Logout from Playphone"; }
-					@Override public void run()        { startActivity(new Intent(MainActivity.this, LogoutActivity.class));}
-				}*/
+					@Override public String toString() { return TAB + "Server info"; }
+					@Override public void run()        { startActivity(new Intent(MainActivity.this, ServerInfoActivity.class));}
+				},
 				new Entry() {
 					@Override public String toString() { return TAB + "Application Info"; }
 					@Override public void run()        { startActivity(new Intent(MainActivity.this, ApplicationInfoActivity.class));}
@@ -203,6 +204,7 @@ public class MainActivity extends ListActivity {
 		MNDirectButton.initWithLocation(MNDirectButton.MNDIRECTBUTTON_TOPLEFT);
 		MNDirectPopup.init(MNDirectPopup.MNDIRECTPOPUP_ALL);
 		
+		//MNDirectUIHelper.setDashboardStyle(MNDirectUIHelper.DASHBOARD_STYLE_FULLSCREEN);
 		
 		getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 	}

@@ -37,5 +37,6 @@
     <string name="week">Week</string>
     <string name="month">Month</string>
     <string name="player_id">Player id : </string>
+    <string name="get_server_info">Get server info</string>
         
 </resources>

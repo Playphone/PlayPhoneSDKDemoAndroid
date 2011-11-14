@@ -85,6 +85,8 @@
               android:configChanges="orientation|keyboard|keyboardHidden"/>
         <activity android:theme="@style/CustomTheme" android:name=".SocialGraphDetailActivity"
               android:configChanges="orientation|keyboard|keyboardHidden"/>
+        <activity android:theme="@style/CustomTheme" android:name=".ServerInfoActivity"
+              android:configChanges="orientation|keyboard|keyboardHidden"/>
         <activity android:theme="@style/CustomTheme" android:name=".ApplicationInfoActivity"
               android:configChanges="orientation|keyboard|keyboardHidden"/>
         <activity android:theme="@style/CustomTheme" android:name=".GameSettingActivity"
