@@ -1776,6 +1776,8 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
       trackingSystem.setBeaconUrlTemplate(smartFoxFacade.configData.beaconTrackerUrl,this);
      }
 
+    socNetSessionFB.enableSingleSignOn(smartFoxFacade.configData.facebookSSOMode != 0);
+
     webServerUrl = smartFoxFacade.configData.webServerUrl;
 
     if (OFFLINE_MODE_DISABLED || offlinePack.isPackUnavailable())
@@ -2979,7 +2981,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
   private static final String APP_PROPERTY_VAR_PATH_PREFIX = "prop.";
   private static final int APP_COMMAND_SET_APP_PROPERTY_PREFIX_LEN = APP_COMMAND_SET_APP_PROPERTY_PREFIX.length();
 
-  public static final String CLIENT_API_VERSION = "1_4_5";
+  public static final String CLIENT_API_VERSION = "1_4_6";
 
   private static final String GAME_ZONE_NAME_PREFIX = "Game_";
   private static final String SMARTFOX_EXT_NAME = "MultiNetExtension";

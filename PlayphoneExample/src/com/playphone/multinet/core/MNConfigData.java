@@ -41,6 +41,7 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
     webServerUrl       = null;
     facebookAPIKey     = null;
     facebookAppId      = null;
+    facebookSSOMode    = 0;
     launchTrackerUrl   = null;
     shutdownTrackerUrl = null;
     beaconTrackerUrl   = null;
@@ -81,6 +82,7 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
         webServerUrl       = parseParamString(params,MULTINET_WEBSERVER_URL_PARAM);
         facebookAPIKey     = parseParamString(params,FACEBOOK_API_KEY_PARAM);
         facebookAppId      = parseParamString(params,FACEBOOK_APP_ID_PARAM);
+        facebookSSOMode    = parseParamInteger(params,FACEBOOK_SSO_MODE_PARAM,true,0);
         launchTrackerUrl   = params.get(LAUNCH_TRACKER_URL_PARAM);
         shutdownTrackerUrl = params.get(SHUTDOWN_TRACKER_URL_PARAM);
         beaconTrackerUrl   = params.get(BEACON_TRACKER_URL_PARAM);
@@ -175,12 +177,25 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
   private int parseParamInteger (Hashtable<String,String> params, String name)
               throws IllegalArgumentException
    {
+    return parseParamInteger(params,name,false,0);
+   }
+
+  private int parseParamInteger (Hashtable<String,String> params, String name, boolean isOptional, int defaultValue)
+              throws IllegalArgumentException
+   {
     int    result = 0;
     String value  = params.get(name);
 
     if (value == null)
      {
-      throw new IllegalArgumentException();
+      if (isOptional)
+       {
+        return defaultValue;
+       }
+      else
+       {
+        throw new IllegalArgumentException();
+       }
      }
 
     try
@@ -235,6 +250,7 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
   public String  webServerUrl;
   public String  facebookAPIKey;
   public String  facebookAppId;
+  public int     facebookSSOMode;
   public String  launchTrackerUrl;
   public String  beaconTrackerUrl;
   public String  shutdownTrackerUrl;
@@ -248,6 +264,7 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
   private static final String MULTINET_WEBSERVER_URL_PARAM = "MultiNetWebServerURL";
   private static final String FACEBOOK_API_KEY_PARAM       = "FacebookApiKey";
   private static final String FACEBOOK_APP_ID_PARAM        = "FacebookAppId";
+  private static final String FACEBOOK_SSO_MODE_PARAM      = "FacebookSSOMode";
   private static final String LAUNCH_TRACKER_URL_PARAM     = "LaunchTrackerURL";
   private static final String SHUTDOWN_TRACKER_URL_PARAM   = "ShutdownTrackerURL";
   private static final String BEACON_TRACKER_URL_PARAM     = "BeaconTrackerURL";

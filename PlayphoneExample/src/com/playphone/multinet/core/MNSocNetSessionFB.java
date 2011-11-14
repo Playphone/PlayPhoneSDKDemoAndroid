@@ -44,6 +44,7 @@ public class MNSocNetSessionFB
     MNSocNetSessionFBUI.authorize(platform.getContext(),
                                   facebook,
                                   permissions,
+                                  useSSO,
                                   new MNSocNetSessionFBUI.IFBDialogEventHandler()
      {
       public void onSuccess ()
@@ -232,6 +233,11 @@ public class MNSocNetSessionFB
     void socNetFBPermissionDialogFailedWithError(String    error);
    }
 
+  void enableSingleSignOn (boolean enable)
+   {
+    this.useSSO = enable;
+   }
+
   Facebook getFacebook ()
    {
     return facebook;
@@ -241,5 +247,6 @@ public class MNSocNetSessionFB
   private IEventHandler eventHandler;
   private Facebook facebook;
   private boolean connecting;
+  private boolean useSSO;
  }
 

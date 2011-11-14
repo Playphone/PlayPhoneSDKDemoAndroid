@@ -26,9 +26,9 @@ class MNSocNetSessionFBUI
     void onCancel  ();
    }
 
-  public static boolean authorize (Context context, Facebook facebook, String[] permissions, IFBDialogEventHandler dialogEventHandler)
+  public static boolean authorize (Context context, Facebook facebook, String[] permissions, boolean useSSO, IFBDialogEventHandler dialogEventHandler)
    {
-    LoginActivityEventHandler eventHandler = new LoginActivityEventHandler(facebook,permissions,dialogEventHandler);
+    LoginActivityEventHandler eventHandler = new LoginActivityEventHandler(facebook,permissions,useSSO,dialogEventHandler);
 
     if (!MNProxyActivity.startProxyActivity(context,eventHandler))
      {
@@ -138,16 +138,17 @@ class MNSocNetSessionFBUI
 
   private static class LoginActivityEventHandler extends ActivityEventHandlerBase
    {
-    public LoginActivityEventHandler (Facebook facebook, String[] permissions, IFBDialogEventHandler dialogEventHandler)
+    public LoginActivityEventHandler (Facebook facebook, String[] permissions, boolean useSSO, IFBDialogEventHandler dialogEventHandler)
      {
       super(facebook,dialogEventHandler);
 
       this.permissions = permissions != null ? permissions : new String[0];
+      this.useSSO      = useSSO;
      }
 
     protected void executeFacebookCall ()
      {
-      if (SSO_MODE_DISABLED)
+      if (useSSO)
        {
         facebook.authorize(activity,permissions,Facebook.FORCE_DIALOG_AUTH,this);
        }
@@ -163,6 +164,7 @@ class MNSocNetSessionFBUI
      }
 
     private final String[] permissions;
+    private final boolean  useSSO;
    }
 
   private static class PublishActivityEventHandler extends ActivityEventHandlerBase
@@ -186,8 +188,8 @@ class MNSocNetSessionFBUI
 
       params.putString("message",prompt);
       params.putString("attachment",attachment);
-      params.putString("actionLinks",actionLinks);
-      params.putString("targetId",targetId);
+      params.putString("action_links",actionLinks);
+      params.putString("target_id",targetId);
 
       facebook.dialog(activity,"stream.publish",params,this);
      }
@@ -220,7 +222,5 @@ class MNSocNetSessionFBUI
 
     private String permissions;
    }
-
-  private static final boolean SSO_MODE_DISABLED = true;
  }
 
