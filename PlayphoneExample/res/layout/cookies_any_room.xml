@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:id="@+id/incBreadCrumbs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        layout="@layout/breadcrumbs" >
+    </include>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/room_list" />
+
+            <ProgressBar
+                android:id="@+id/roomListProgress"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/reloadListButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reload_list" />
+
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/roomListView"
+            android:layout_width="match_parent"
+            android:layout_height="150dp" android:layout_margin="10dp">
+        </ListView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="   Select room from list to load cookies" />
+
+        <TextView
+            android:id="@+id/cookiesInfoText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" android:layout_margin="10dp"/>
+        
+    </LinearLayout>
+
+</LinearLayout>

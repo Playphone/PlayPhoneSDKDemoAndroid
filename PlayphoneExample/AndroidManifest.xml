@@ -97,6 +97,12 @@
               android:configChanges="orientation|keyboard|keyboardHidden"/>
         <activity android:theme="@style/CustomTheme" android:name=".PlayerLeaderBoardActivity"
               android:configChanges="orientation|keyboard|keyboardHidden"/>
+        <activity android:theme="@style/CustomTheme" android:name=".CookiesModeActivity"
+              android:configChanges="orientation|keyboard|keyboardHidden"/>
+        <activity android:theme="@style/CustomTheme" android:name=".CookiesAnyRoomActivity"
+              android:configChanges="orientation|keyboard|keyboardHidden"/>
+        <activity android:theme="@style/CustomTheme" android:name=".CookiesCurrentRoomActivity"
+              android:configChanges="orientation|keyboard|keyboardHidden"/>
         <receiver android:name="com.playphone.multinet.core.MNInstallReferrerReceiver"
           android:exported="true">
     		<intent-filter>

@@ -38,5 +38,14 @@
     <string name="month">Month</string>
     <string name="player_id">Player id : </string>
     <string name="get_server_info">Get server info</string>
-        
+    <string name="current_room">Current game room</string>
+    <string name="any_room">Any game room</string>
+    <string name="store_cookie">Store cookie</string>
+    <string name="read_cookies">Read cookies</string>
+    <string name="room_list">Room list : </string>
+    <string name="reload_list">Reload list</string>
+    <string name="exit">Exit</string>
+    <string name="yousure">Are you sure ?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

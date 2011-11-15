@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:id="@+id/incBreadCrumbs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        layout="@layout/breadcrumbs" >
+    </include>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/roomText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:text="Room id : " />
+
+        <EditText
+            android:id="@+id/cookieValueEdit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <requestFocus />
+        </EditText>
+
+        <Button
+            android:id="@+id/storeCookieButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/store_cookie" />
+
+        <Button
+            android:id="@+id/readCookieButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/read_cookies" />
+
+        <TextView
+            android:id="@+id/resultText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        
+    </LinearLayout>
+
+</LinearLayout>
