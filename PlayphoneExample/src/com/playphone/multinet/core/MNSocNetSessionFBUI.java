@@ -150,11 +150,11 @@ class MNSocNetSessionFBUI
      {
       if (useSSO)
        {
-        facebook.authorize(activity,permissions,Facebook.FORCE_DIALOG_AUTH,this);
+        facebook.authorize(activity,permissions,this);
        }
       else
        {
-        facebook.authorize(activity,permissions,this);
+        facebook.authorize(activity,permissions,Facebook.FORCE_DIALOG_AUTH,this);
        }
      }
 
