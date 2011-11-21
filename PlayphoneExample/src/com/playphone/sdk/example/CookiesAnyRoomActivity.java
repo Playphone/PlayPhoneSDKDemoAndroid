@@ -66,12 +66,8 @@ public class CookiesAnyRoomActivity extends CustomTitleActivity implements
 
 		@Override
 		public void onRequestError(MNWSRequestError error) {
-			Message msg = new Message();
-
-			msg.what = ROOM_LIST_REQUEST_ERROR;
-			msg.obj = error;
-
-			handler.sendMessage(msg);
+			Message msg = handler.obtainMessage(ROOM_LIST_REQUEST_ERROR,error);
+			msg.sendToTarget();
 			handler.sendEmptyMessage(STOP_ROOM_LIST_PROGRESS);
 		}
 
@@ -91,9 +87,7 @@ public class CookiesAnyRoomActivity extends CustomTitleActivity implements
 			CookiesAnyRoomActivity.this.roomList.clear();
 			CookiesAnyRoomActivity.this.roomList.addAll(rooms);
 
-			Message msg = new Message();
-			msg.what = ROOM_LIST_REQUEST_SUCCESS;
-			handler.sendMessage(msg);
+			handler.sendEmptyMessage(ROOM_LIST_REQUEST_SUCCESS);
 			handler.sendEmptyMessage(STOP_ROOM_LIST_PROGRESS);
 		}
 	}
@@ -132,24 +126,17 @@ public class CookiesAnyRoomActivity extends CustomTitleActivity implements
 			} else {
 				cookiesList.remove(key);
 			}
-			Message msg = new Message();
-
-			msg.what = GAME_COOKIE_DOWNLOAD_SUCCESS;
-			msg.obj = new Integer(roomSFId);
-
-			handler.sendMessage(msg);
-
+			
+			Message msg = handler.obtainMessage(GAME_COOKIE_DOWNLOAD_SUCCESS, new Integer(roomSFId));
+			msg.sendToTarget();
 		}
 
 		@Override
 		public void onGameRoomCookieDownloadFailedWithError(int roomSFId,
 				int key, String error) {
 			// skip
-			Message msg = new Message();
-
-			msg.what = GAME_COOKIE_DOWNLOAD_FAIL;
-			msg.obj = error;
-			handler.sendMessage(msg);
+			Message msg = handler.obtainMessage(GAME_COOKIE_DOWNLOAD_FAIL, error);
+			msg.sendToTarget();
 		}
 
 		@Override

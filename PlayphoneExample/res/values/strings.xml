@@ -48,4 +48,5 @@
     <string name="yousure">Are you sure ?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="post_score">Post score</string>
 </resources>

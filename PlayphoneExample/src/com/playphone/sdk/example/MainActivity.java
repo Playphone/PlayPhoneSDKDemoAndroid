@@ -156,14 +156,6 @@ public class MainActivity extends ListActivity {
 						DashboardControlActivity.class));
 			}
 		},
-		/*
-		 * new Entry() {
-		 * 
-		 * @Override public String toString() { return TAB + "Notifications"; }
-		 * 
-		 * @Override public void run() { startActivity(new
-		 * Intent(MainActivity.this, NotificationPanelActivity.class)); } },
-		 */
 		new Entry() {
 			@Override
 			public String toString() {
@@ -176,14 +168,6 @@ public class MainActivity extends ListActivity {
 						PostCloudStorageActivity.class));
 			}
 		},
-		/*
-		 * new Entry() {
-		 * 
-		 * @Override public String toString() { return TAB + "Settings"; }
-		 * 
-		 * @Override public void run() { startActivity(new
-		 * Intent(MainActivity.this, NotImplementedActivity.class));} },
-		 */
 		new Entry() {
 			@Override
 			public String toString() {
@@ -192,8 +176,6 @@ public class MainActivity extends ListActivity {
 
 			@Override
 			public void run() {
-				// startActivity(new Intent(MainActivity.this,
-				// MultiPlayerActivity.class));
 				MNDirect.execAppCommand("jumpToUserHome", null);
 				MNDirectUIHelper.showDashboard();
 				Toast.makeText(
@@ -203,74 +185,6 @@ public class MainActivity extends ListActivity {
 			}
 
 		},
-		/*
-		 * new Entry() {
-		 * 
-		 * @Override public String toString() { return "Dashboard"; }
-		 * 
-		 * @Override public void run() {
-		 * MNDirect.execAppCommand("jumpToUserProfile",null);
-		 * MNDirectUIHelper.showDashboard(); } }, new Entry() {
-		 * 
-		 * @Override public String toString() { return "Dashboard: Friends"; }
-		 * 
-		 * @Override public void run() {
-		 * MNDirect.execAppCommand("jumpToBuddyList",null);
-		 * MNDirectUIHelper.showDashboard(); } }, new Entry() {
-		 * 
-		 * @Override public String toString() { return
-		 * "Dashboard: Leaderboards"; }
-		 * 
-		 * @Override public void run() {
-		 * MNDirect.execAppCommand("jumpToLeaderboard",null);
-		 * MNDirectUIHelper.showDashboard(); } }, new Entry() {
-		 * 
-		 * @Override public String toString() { return
-		 * "Dashboard: Achievements"; }
-		 * 
-		 * @Override public void run() {
-		 * MNDirect.execAppCommand("jumpToAchievements",null);
-		 * MNDirectUIHelper.showDashboard(); } }, new Entry() {
-		 * 
-		 * @Override public String toString() { return
-		 * "Post score in Leaderboard"; }
-		 * 
-		 * @Override public void run() { startActivity(new
-		 * Intent(MainActivity.this, PostScoreActivity.class)); } }, new Entry()
-		 * {
-		 * 
-		 * @Override public String toString() { return "Unlock an Achievement";
-		 * }
-		 * 
-		 * @Override public void run() { startActivity(new
-		 * Intent(MainActivity.this, PostAchievementActivity.class)); } }, new
-		 * Entry() {
-		 * 
-		 * @Override public String toString() { return "Current User Info"; }
-		 * 
-		 * @Override public void run() { startActivity(new
-		 * Intent(MainActivity.this, CurrentUserInfoActivity.class));} }, new
-		 * Entry() {
-		 * 
-		 * @Override public String toString() { return "Cloud Storage basics"; }
-		 * 
-		 * @Override public void run() { startActivity(new
-		 * Intent(MainActivity.this, PostCloudStorageActivity.class)); } }, new
-		 * Entry() {
-		 * 
-		 * @Override public String toString() { return
-		 * "Purchase and manage potions (sample in-game item)"; }
-		 * 
-		 * @Override public void run() { startActivity(new
-		 * Intent(MainActivity.this, BuyItemsActivity.class)); } }, new Entry()
-		 * {
-		 * 
-		 * @Override public String toString() { return
-		 * "VirtualItem Basics (OBSOLETE)"; }
-		 * 
-		 * @Override public void run() { startActivity(new
-		 * Intent(MainActivity.this, VirtualItemsActivity.class));} },
-		 */
 		new Entry() {
 			@Override
 			public String toString() {
@@ -405,17 +319,7 @@ public class MainActivity extends ListActivity {
 			}
 			Log.d("playphone", "The new status is " + newStatus);
 
-			// notify the login activity if it is the top activity
-			// detectActivityOnTop(LoginUserActivity.class.getCanonicalName());
-			/*
-			 * Intent intent = new Intent(MainActivity.this,
-			 * LoginUserActivity.class);
-			 * intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP); Bundle bundle =
-			 * new Bundle(); bundle.putInt("loginStatus", newStatus);
-			 * intent.putExtras(bundle); startActivity(intent);
-			 */
 		}
-
 	}
 
 	@Override
@@ -442,20 +346,4 @@ public class MainActivity extends ListActivity {
 		}
 		return super.onKeyUp(keyCode, event);
 	}
-
-	/*
-	 * private boolean detectActivityOnTop(String classname){
-	 * Log.d("playphone","Check for classname: " + classname); // get a list of
-	 * running processes and iterate through them ActivityManager am =
-	 * (ActivityManager) this .getSystemService(ACTIVITY_SERVICE);
-	 * 
-	 * // get the info from the currently running task
-	 * List<ActivityManager.RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-	 * 
-	 * Log.d("playphone", "CURRENT Activity :" +
-	 * taskInfo.get(0).topActivity.getClassName()); return false;
-	 * 
-	 * }
-	 */
-
 }

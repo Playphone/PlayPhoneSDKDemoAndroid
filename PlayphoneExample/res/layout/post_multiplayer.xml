@@ -1,9 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:id="@+id/relativeLayout1" android:layout_height="match_parent">
-        <TextView android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceMedium" android:id="@+id/textView1" android:text="Type a message to send to other users" android:layout_alignBaseline="@+id/editText1" android:layout_alignBottom="@+id/editText1" android:layout_alignParentLeft="true" android:layout_width="match_parent"></TextView>
-        <EditText android:inputType="text" android:layout_height="wrap_content" android:id="@+id/editInput" android:layout_below="@+id/textView1" android:layout_alignParentLeft="true" android:layout_marginTop="30dp" android:layout_width="match_parent"></EditText>
-        <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:id="@+id/txtResult" android:layout_alignParentLeft="true" android:layout_alignParentRight="true" android:layout_below="@+id/btnUpload"></TextView>
-        <Button android:text="Back to Main" android:layout_height="wrap_content" android:id="@+id/btnBack" android:layout_alignParentBottom="true" android:layout_alignParentLeft="true" android:layout_width="match_parent"></Button>
-        <Button android:text="Send message!" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/btnUpload" android:layout_below="@+id/editInput" android:layout_alignParentLeft="true" android:layout_marginTop="50dp"></Button>
-    </RelativeLayout>
-    
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:id="@+id/incBreadCrumbs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        layout="@layout/breadcrumbs" >
+    </include>
+
+    <FrameLayout
+        android:id="@+id/scoreProgressLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:id="@+id/gameControlsLayout">
+
+            <Button
+                android:id="@+id/minusScoreButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-10 score" />
+
+            <Button
+                android:id="@+id/plusScoreButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:text="+10 score" />
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/postScoreButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/post_score" />
+
+        <TextView
+            android:id="@+id/gameScoreText"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="30dp"
+            android:text="Score : 0" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Type a message to send to other users"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <EditText
+            android:id="@+id/editInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:inputType="text" >
+        </EditText>
+
+        <Button
+            android:id="@+id/btnUpload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Send message!" />
+
+        <TextView
+            android:id="@+id/txtResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge" >
+        </TextView>
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Back to Lobby" >
+        </Button>
+    </LinearLayout>
+
+</LinearLayout>
