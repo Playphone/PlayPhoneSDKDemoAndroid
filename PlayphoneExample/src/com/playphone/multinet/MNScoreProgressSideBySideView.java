@@ -3,11 +3,15 @@ package com.playphone.multinet;
 import com.playphone.multinet.MNConst;
 import com.playphone.multinet.MNUserInfo;
 import com.playphone.multinet.core.MNSession;
-import com.playphone.multinet.MNScoreProgressHelper;
 import com.playphone.multinet.providers.MNScoreProgressProvider.ScoreItem;
+import com.playphone.multinet.providers.MNScoreProgressProvider.IEventHandler;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Handler.Callback;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -18,8 +22,18 @@ import android.widget.TextView;
 /**
  * MNScoreProgressView class
  */
-public class MNScoreProgressSideBySideView extends LinearLayout implements
-		MNScoreProgressHelper.IProgressHandler {
+class MNScoreProgressSideBySideView extends LinearLayout implements
+		IEventHandler, Callback {
+	boolean debugLog = true;
+
+	/* in message object our Bitmap waiting */
+	private static final int OUR_AVATAR_UPDATED_EVENT = 1;
+	/* in message object waiting opponent Bitmap */
+	private static final int OPPONENT_AVATAR_UPDATED_EVENT = 2;
+	/* in message object ScoreItem[] array */
+	private static final int SCOREBOARD_UPDATED_EVENT = 3;
+
+	private Handler handler = new Handler(this);
 
 	View left_user_layout;
 	ImageView left_avatar;
@@ -33,7 +47,6 @@ public class MNScoreProgressSideBySideView extends LinearLayout implements
 	TextView right_user_score;
 	TextView right_user_status;
 
-	private MNSession session;
 	private final Resources res;
 	private final int fieldBlueId;
 	private final int fieldGreenId;
@@ -50,37 +63,41 @@ public class MNScoreProgressSideBySideView extends LinearLayout implements
 		super(context, attrs);
 
 		res = context.getApplicationContext().getResources();
-		fieldBlueId = res.getIdentifier("mnprogressindicator_sticker_blue", "drawable",
-				context.getPackageName());
-		fieldGreenId = res.getIdentifier("mnprogressindicator_sticker_green", "drawable",
-				context.getPackageName());
-		fieldRedId = res.getIdentifier("mnprogressindicator_sticker_red", "drawable",
-				context.getPackageName());
-		defaultAvatarId = res.getIdentifier("mnprogressindicator_sticker_avatar", "drawable",
+		fieldBlueId = res.getIdentifier("mnprogressindicator_sticker_blue",
+				"drawable", context.getPackageName());
+		fieldGreenId = res.getIdentifier("mnprogressindicator_sticker_green",
+				"drawable", context.getPackageName());
+		fieldRedId = res.getIdentifier("mnprogressindicator_sticker_red",
+				"drawable", context.getPackageName());
+		defaultAvatarId = res.getIdentifier(
+				"mnprogressindicator_sticker_avatar", "drawable",
 				context.getPackageName());
 	}
 
 	private ScoreItem getMyScore(ScoreItem[] scoreBoard) {
-		for (ScoreItem item : scoreBoard) {
-			if (item.userInfo.userId == session.getMyUserId())
-				return item;
+		final MNSession session = MNDirect.getSession();
+		if (session != null) {
+			for (ScoreItem item : scoreBoard) {
+				if (item.userInfo.userId == session.getMyUserId())
+					return item;
+			}
 		}
 		return null;
 	}
 
 	private ScoreItem getBestOpponentScore(ScoreItem[] scoreBoard) {
-		for (ScoreItem item : scoreBoard) {
-			if (item.userInfo.userId != session.getMyUserId())
-				return item;
+		// TODO : search real best opponent
+		final MNSession session = MNDirect.getSession();
+		if (session != null) {
+			for (ScoreItem item : scoreBoard) {
+				if (item.userInfo.userId != session.getMyUserId())
+					return item;
+			}
 		}
 		return null;
 	}
 
 	// <begin implementationOf="MNScoreProgress.IProgressHandler">
-	@Override
-	public void setSession(MNSession session) {
-		this.session = session;
-	}
 
 	private static final int MAX_INFO_LENGTH = 10;
 
@@ -164,55 +181,80 @@ public class MNScoreProgressSideBySideView extends LinearLayout implements
 		}
 	}
 
-	@Override
-	public void onScoresUpdated(ScoreItem[] scoreBoard) {
+	protected void scoreUpdate(final ScoreItem[] scoreBoard) {
 		final ScoreItem ourItemScore = getMyScore(scoreBoard);
 		final ScoreItem oppItemScore = getBestOpponentScore(scoreBoard);
 
-		this.post(new Runnable() {
-			@Override
-			public void run() {
-				int len;
+		int len;
 
-				if (ourItemScore != null) {
-					updateOurAvatar(ourItemScore.userInfo);
-					left_user_name.setText(ourItemScore.userInfo.userName);
-					len = fillNumberBuffer(ourScore, ourItemScore.score);
-					left_user_score.setText(ourScore, MAX_INFO_LENGTH - len,
-							len);
-					len = fillStatusBuffer(ourStatus, ourItemScore.place);
-					left_user_status.setText(ourStatus, MAX_INFO_LENGTH - len,
-							len + 2);
-				}
+		if (ourItemScore != null) {
+			updateOurAvatar(ourItemScore.userInfo);
+			left_user_name.setText(ourItemScore.userInfo.userName);
+			len = fillNumberBuffer(ourScore, ourItemScore.score);
+			left_user_score.setText(ourScore, MAX_INFO_LENGTH - len, len);
+			len = fillStatusBuffer(ourStatus, ourItemScore.place);
+			left_user_status.setText(ourStatus, MAX_INFO_LENGTH - len, len + 2);
+		}
 
-				if (oppItemScore != null) {
-					updateOppAvatar(oppItemScore.userInfo);
-					right_user_name.setText(oppItemScore.userInfo.userName);
-					len = fillNumberBuffer(oppScore, oppItemScore.score);
-					right_user_score.setText(oppScore, MAX_INFO_LENGTH - len,
-							len);
-					len = fillStatusBuffer(oppStatus, oppItemScore.place);
-					right_user_status.setText(oppStatus, MAX_INFO_LENGTH - len,
-							len + 2);
-				}
+		if (oppItemScore != null) {
+			updateOppAvatar(oppItemScore.userInfo);
+			right_user_name.setText(oppItemScore.userInfo.userName);
+			len = fillNumberBuffer(oppScore, oppItemScore.score);
+			right_user_score.setText(oppScore, MAX_INFO_LENGTH - len, len);
+			len = fillStatusBuffer(oppStatus, oppItemScore.place);
+			right_user_status
+					.setText(oppStatus, MAX_INFO_LENGTH - len, len + 2);
+		}
 
-				if ((ourItemScore != null) && (oppItemScore != null)) {
-					colorScoreBoardFields(ourItemScore.place,
-							oppItemScore.place);
-				}
+		if ((ourItemScore != null) && (oppItemScore != null)) {
+			colorScoreBoardFields(ourItemScore.place, oppItemScore.place);
+		}
+
+		if (debugLog) {
+			StringBuffer logMsg = new StringBuffer();
+
+			logMsg.append(" * scoresUpdate our:");
+
+			if (ourItemScore == null) {
+				logMsg.append("(null) null");
+			} else {
+				logMsg.append("(").append(ourItemScore.place).append(") ")
+						.append(ourItemScore.score);
 			}
-		});
+
+			logMsg.append(" opp:");
+
+			if (oppItemScore == null) {
+				logMsg.append("(null) null");
+			} else {
+				logMsg.append("(").append(oppItemScore.place).append(") ")
+						.append(oppItemScore.score);
+			}
+
+			Log.d("MNScoreProgressSideBySideView", logMsg.toString());
+			logMsg = null;
+		}
 	}
 
 	// <end implementationOf="MNScoreProgress.IProgressHandler">
+
+	@Override
+	public void onScoresUpdated(final ScoreItem[] scoreBoard) {
+		Message msg = handler.obtainMessage(SCOREBOARD_UPDATED_EVENT,
+				scoreBoard);
+		msg.sendToTarget();
+	}
 
 	private void updateOppAvatar(final MNUserInfo userInfo) {
 
 		if (oppAvatarId == userInfo.userId)
 			return;
+		Message oppAvatarMsg = handler
+				.obtainMessage(OPPONENT_AVATAR_UPDATED_EVENT);
 
 		oppAvatarId = userInfo.userId;
-		MNScoreProgressUtil.downloadImageAssinc(right_avatar, userInfo
+
+		MNScoreProgressUtil.downloadImageAssinc(oppAvatarMsg, userInfo
 				.getAvatarUrl(), MNScoreProgressUtil.getBitmapImageById(
 				getResources(), defaultAvatarId));
 	}
@@ -223,7 +265,10 @@ public class MNScoreProgressSideBySideView extends LinearLayout implements
 			return;
 
 		ourAvatarId = userInfo.userId;
-		MNScoreProgressUtil.downloadImageAssinc(left_avatar, userInfo
+
+		Message ourAvatarMsg = handler.obtainMessage(OUR_AVATAR_UPDATED_EVENT);
+
+		MNScoreProgressUtil.downloadImageAssinc(ourAvatarMsg, userInfo
 				.getAvatarUrl(), MNScoreProgressUtil.getBitmapImageById(
 				getResources(), defaultAvatarId));
 	}
@@ -274,5 +319,29 @@ public class MNScoreProgressSideBySideView extends LinearLayout implements
 				Log.d(this.getClass().getName(), "onFinishInflate");
 			}
 		});
+
+	}
+
+	@Override
+	public boolean handleMessage(Message msg) {
+		if (msg.what == OUR_AVATAR_UPDATED_EVENT) {
+			if (msg.obj != null) {
+				left_avatar.setImageBitmap((Bitmap) msg.obj);
+				msg.obj = null;
+			}
+		} else if (msg.what == OPPONENT_AVATAR_UPDATED_EVENT) {
+			if (msg.obj != null) {
+				right_avatar.setImageBitmap((Bitmap) msg.obj);
+				msg.obj = null;
+			}
+		} else if (msg.what == SCOREBOARD_UPDATED_EVENT) {
+			final ScoreItem[] scoreBoard = (ScoreItem[]) msg.obj;
+			scoreUpdate(scoreBoard);
+			msg.obj = null;
+		} else {
+			return false;
+		}
+
+		return true;
 	}
 }

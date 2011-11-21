@@ -2,6 +2,9 @@ package com.playphone.multinet;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Handler.Callback;
+import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -13,13 +16,19 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.playphone.multinet.core.MNSession;
+import com.playphone.multinet.providers.MNScoreProgressProvider.IEventHandler;
 import com.playphone.multinet.providers.MNScoreProgressProvider.ScoreItem;
 
 /**
  *
  */
-public class MNScoreProgressHorisontalView extends LinearLayout implements
-		MNScoreProgressHelper.IProgressHandler {
+class MNScoreProgressHorisontalView extends LinearLayout implements
+		IEventHandler, Callback {
+
+	/* in message object ScoreItem[] array */
+	private static final int SCOREBOARD_UPDATED_EVENT = 3;
+
+	private Handler handler = new Handler(this);
 
 	private final Resources res;
 
@@ -67,34 +76,31 @@ public class MNScoreProgressHorisontalView extends LinearLayout implements
 				context.getPackageName());
 	}
 
-	private MNSession session;
-
-	@Override
-	public void setSession(MNSession session) {
-		this.session = session;
-	}
-
 	private ScoreItem getMyScore(ScoreItem[] scoreBoard) {
-		for (ScoreItem item : scoreBoard) {
-			if (item.userInfo.userId == session.getMyUserId())
-				return item;
+		final MNSession session = MNDirect.getSession();
+		if (session != null) {
+			for (ScoreItem item : scoreBoard) {
+				if (item.userInfo.userId == session.getMyUserId())
+					return item;
+			}
 		}
 		return null;
 	}
 
 	private ScoreItem getBestOpponentScore(ScoreItem[] scoreBoard) {
-		for (ScoreItem item : scoreBoard) {
-			if (item.userInfo.userId != session.getMyUserId())
-				return item;
+		// TODO : search real best opponent
+		final MNSession session = MNDirect.getSession();
+		if (session != null) {
+			for (ScoreItem item : scoreBoard) {
+				if (item.userInfo.userId != session.getMyUserId())
+					return item;
+			}
 		}
 		return null;
 	}
 
 	protected long oldScoreDiff = 0;
 	protected boolean isIWinState;
-
-	protected ScoreItem myScoreItem;
-	protected ScoreItem oppScoreItem;
 
 	protected void setNewYPos(View view, int yPos) {
 		final RelativeLayout.LayoutParams lp = (RelativeLayout.LayoutParams) view
@@ -115,10 +121,9 @@ public class MNScoreProgressHorisontalView extends LinearLayout implements
 		mOppLayout.startAnimation(animationOppToUp);
 	}
 
-	protected final Runnable scoreUpdateAction = new Runnable() {
-		public void run() {
-			final ScoreItem myLocalScoreItem = myScoreItem;
-			final ScoreItem oppLocalScoreItem = oppScoreItem;
+		public void scoreUpdate(final ScoreItem[] scoreBoard) {
+			final ScoreItem myLocalScoreItem = getMyScore(scoreBoard);
+			final ScoreItem oppLocalScoreItem = getBestOpponentScore(scoreBoard);
 
 			// TODO : optimization GC need (strings)
 			if (myLocalScoreItem != null) {
@@ -152,8 +157,7 @@ public class MNScoreProgressHorisontalView extends LinearLayout implements
 						"isIWinState:" + String.valueOf(isIWinState)
 								+ "    currentScoreDiff:"
 								+ String.valueOf(currentScoreDiff));
-				
-				
+
 				if (isIWinState) {
 					if (currentScoreDiff < 0) {
 						animationBackward();
@@ -169,15 +173,11 @@ public class MNScoreProgressHorisontalView extends LinearLayout implements
 				oldScoreDiff = currentScoreDiff;
 			}
 		}
-	};
 
 	@Override
 	public void onScoresUpdated(ScoreItem[] scoreBoard) {
-
-		myScoreItem = getMyScore(scoreBoard);
-		oppScoreItem = getBestOpponentScore(scoreBoard);
-
-		this.post(scoreUpdateAction);
+		Message msg = handler.obtainMessage(SCOREBOARD_UPDATED_EVENT, scoreBoard);
+		msg.sendToTarget();
 	}
 
 	@Override
@@ -214,32 +214,45 @@ public class MNScoreProgressHorisontalView extends LinearLayout implements
 		animaterLineHeight = 20; // mMyLayout.getHeight();
 		Log.i(this.getClass().getSimpleName(),
 				"Height " + String.valueOf(animaterLineHeight));
-		
-		animationMyToDown = new TranslateAnimation
-	    (Animation.ABSOLUTE, 0,                   Animation.ABSOLUTE, 0,
-	     Animation.ABSOLUTE, 0,                   Animation.ABSOLUTE, animaterLineHeight);
-		animationMyToUp = new TranslateAnimation
-		(Animation.ABSOLUTE, 0,                   Animation.ABSOLUTE, 0,
-		 Animation.ABSOLUTE, animaterLineHeight,  Animation.ABSOLUTE, 0);
-		animationOppToDown = new TranslateAnimation
-		(Animation.ABSOLUTE, 0,                   Animation.ABSOLUTE, 0,
-		 Animation.ABSOLUTE, -animaterLineHeight, Animation.ABSOLUTE, 0);
-		animationOppToUp = new TranslateAnimation
-		(Animation.ABSOLUTE, 0,                   Animation.ABSOLUTE, 0,
-		 Animation.ABSOLUTE, 0, 				  Animation.ABSOLUTE,-animaterLineHeight);
-		
+
+		animationMyToDown = new TranslateAnimation(Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, animaterLineHeight);
+		animationMyToUp = new TranslateAnimation(Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, 0, Animation.ABSOLUTE, animaterLineHeight,
+				Animation.ABSOLUTE, 0);
+		animationOppToDown = new TranslateAnimation(Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, 0, Animation.ABSOLUTE, -animaterLineHeight,
+				Animation.ABSOLUTE, 0);
+		animationOppToUp = new TranslateAnimation(Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, 0, Animation.ABSOLUTE, 0,
+				Animation.ABSOLUTE, -animaterLineHeight);
+
 		animationMyToDown.setDuration(TRANSLATE_ANIMATION_DURATION);
 		animationOppToDown.setDuration(TRANSLATE_ANIMATION_DURATION);
 		animationMyToUp.setDuration(TRANSLATE_ANIMATION_DURATION);
 		animationOppToUp.setDuration(TRANSLATE_ANIMATION_DURATION);
-		
+
 		animationMyToDown.setFillAfter(true);
 		animationOppToDown.setFillAfter(true);
 		animationMyToUp.setFillAfter(true);
 		animationOppToUp.setFillAfter(true);
-		
+
 		isIWinState = true;
-		
+
 		mMyProgress.setText("0");
+	}
+
+	@Override
+	public boolean handleMessage(Message msg) {
+		if (msg.what == SCOREBOARD_UPDATED_EVENT) {
+			final ScoreItem[] scoreBoard = (ScoreItem[]) msg.obj;
+			scoreUpdate(scoreBoard);
+			msg.obj = null;
+		} else {
+			return false;
+		}
+
+		return true;
 	}
 }

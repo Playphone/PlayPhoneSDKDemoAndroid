@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.playphone.multinet.MNDirect;
-import com.playphone.multinet.core.MNSession;
 import com.playphone.multinet.providers.MNScoreProgressProvider;
 import com.playphone.multinet.providers.MNScoreProgressProvider.ScoreItem;;
 
@@ -18,40 +17,14 @@ import com.playphone.multinet.providers.MNScoreProgressProvider.ScoreItem;;
  *
  */
 public class MNScoreProgressHelper {
-	private ViewGroup targetFrame;
-	private MNScoreProgressProvider pluginScoreProgress;
-	private MNSession session;
-	private IProgressHandler ph;
+	protected ViewGroup targetFrame;
+	protected MNScoreProgressProvider pluginScoreProgress;
+	protected MNScoreProgressProvider.IEventHandler ph;
 
-	/**
-	 * Class progress indicator view must to implement 
-	 * IProgressHandler interface
-	 */
-	public interface IProgressHandler extends
-			MNScoreProgressProvider.IEventHandler {
-		/**
-		 * @param session 
-		 */
-		public void setSession(MNSession session);
-	}
-	
-	/**
-	 * @param session
-	 *            MultiNet session instance
-	 */
-	public MNScoreProgressHelper(final MNSession session) {
-		this.session = session;
-	}
-	
 	/**
 	 * Create only if MNDirect initialized 
 	 */
-	public MNScoreProgressHelper() {
-		this(MNDirect.getSession());
-	}
-
-
-	private View inflateView(int viewId, Context context) {
+	protected View inflateView(int viewId, Context context) {
 		// Inflate View
 		final LayoutInflater li = LayoutInflater.from(context);
 		View progressView = li.inflate(viewId, targetFrame, false);
@@ -59,7 +32,7 @@ public class MNScoreProgressHelper {
 		return (progressView);
 	}
 
-	private static class Params {
+	protected static class Params {
 
 		public int interval = 0;
 		public int delay = 0;
@@ -125,8 +98,8 @@ public class MNScoreProgressHelper {
 		targetFrame.addView(progressView);
 
 		// Install plugin
-		if (progressView instanceof MNScoreProgressHelper.IProgressHandler) {
-			ph = (MNScoreProgressHelper.IProgressHandler) progressView;
+		if (progressView instanceof MNScoreProgressProvider.IEventHandler) {
+			ph = (MNScoreProgressProvider.IEventHandler) progressView;
 		} else {
 			throw new RuntimeException(
 					"progress view not processed score events");
@@ -145,12 +118,11 @@ public class MNScoreProgressHelper {
 		}
 
 		if ((p.interval <= 0) && (p.delay <= 0)) {
-			pluginScoreProgress = new MNScoreProgressProvider(session);
+			pluginScoreProgress = MNDirect.getScoreProgressProvider();
 		} else {
-			pluginScoreProgress = new MNScoreProgressProvider(session,
-					p.interval, p.delay);
+			pluginScoreProgress = MNDirect.getScoreProgressProvider();
+			pluginScoreProgress.setRefreshIntervalAndUpdateDelay(p.interval, p.delay);
 		}
-		ph.setSession(session);
 		
 		return progressView;
 	}

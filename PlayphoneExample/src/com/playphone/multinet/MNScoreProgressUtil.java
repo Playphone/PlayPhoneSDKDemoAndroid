@@ -8,16 +8,16 @@ import com.playphone.multinet.core.MNURLDownloader;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Message;
 import android.util.Log;
-import android.widget.ImageView;
 
 /**
- *
+ *  Score progress processing utility methods
  */
-public class MNScoreProgressUtil {
+class MNScoreProgressUtil {
 
 	/**
-	 * load image from application resources
+	 * Call for loading image from application resources
 	 * 
 	 * @param res
 	 *            application resources object
@@ -29,52 +29,61 @@ public class MNScoreProgressUtil {
 		return BitmapFactory.decodeResource(res, id);
 	}
 
-	public static void downloadImageAssinc(final ImageView targetView,
-			final String url, final Bitmap defaultImg) {
-		
+	/**
+	 * 
+	 * Call for asynchronous loading bitmap image by url
+	 * 
+	 * @param msg
+	 *            Object will be linked to bitmap image by url on finish of loading.  
+	 *            After message will be sent .  
+	 * @param url 
+	 *            download image url
+	 * @param defaultImg
+	 *            default image bitmap. This will be sent as message object if
+	 *            any download url image error by sendToTarget() method.
+	 *            Create msg by handler.obtainMessage(...) function if need.    
+	 */
+	public static void downloadImageAssinc(final Message msg, final String url,
+			final Bitmap defaultImg) {
+
 		class ImageDownloader extends MNURLDownloader implements
 				MNURLDownloader.IErrorEventHandler {
 
 			public Bitmap result = null;
-			
+
 			public void loadURL(String url) {
 				super.loadURL(url, null, this);
 			}
 
 			public void downloaderLoadFailed(MNURLDownloader downloader,
 					ErrorInfo errorInfo) {
+				msg.obj = defaultImg;
+				msg.sendToTarget();
 				Log.e("ImageDownloader", errorInfo.getMessage());
 			}
 
 			protected void readData(InputStream inputStream) throws IOException {
-				try {
-					result = BitmapFactory.decodeStream(inputStream);
-					
-					if (result == null) {
-						result = defaultImg;	
-					}
-						
-					if (result !=  null) {
-						targetView.post(new Runnable() {
-						@Override
-						public void run() {
-							targetView.setImageBitmap(result);
-						}
-					});
+				result = BitmapFactory.decodeStream(inputStream);
 
-					Log.i("ImageDownloader", "Downloaded image with height = "
-							+ Integer.toString(result.getHeight()));
-					Log.i("ImageDownloader", "Downloaded image with width = "
-							+ Integer.toString(result.getWidth()));
-					}
-				} catch (Exception e) {
-					// do nothing
+				if (result == null) {
+					result = defaultImg;
 				}
-			};
+
+				if (result != null) {
+					msg.obj = result;
+					msg.sendToTarget();
+				}
+
+				Log.i("ImageDownloader",
+						"Image downloaded ok : height = "
+								+ Integer.toString(result.getHeight())
+								+ ", width = "
+								+ Integer.toString(result.getWidth()));
+			}
+
 		}
-		
 		ImageDownloader downloader = new ImageDownloader();
 
 		downloader.loadURL(url);
-	}	
+	}
 }
