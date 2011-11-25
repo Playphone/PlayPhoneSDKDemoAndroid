@@ -73,6 +73,8 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     eventHandlers   = new MNEventHandlerArray<IMNSessionEventHandler>();
 
     roomExtraInfoReceived = false;
+    fastResumeEnabled     = true;
+    webShopIsReady        = false;
 
     smartFoxFacade = new MNSmartFoxFacade
                           (platform,
@@ -99,8 +101,6 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     offlinePack = new MNOfflinePack(platform,gameId,this);
 
     webServerUrl = null;
-    fbAppId      = null;
-
     launchParam  = null;
 
     launchTime = System.currentTimeMillis() / 1000;
@@ -395,6 +395,21 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     else
      {
       return loginWithDeviceCredentials();
+     }
+   }
+
+  private boolean loginWithStoredCredentials ()
+   {
+    MNUserCredentials lastUserCredentials = MNUserCredentials.getMostRecentlyLoggedUserCredentials(varStorage);
+
+    if (lastUserCredentials != null)
+     {
+      return loginWithUserIdAndAuthSign
+              (lastUserCredentials.userId,lastUserCredentials.userAuthSign);
+     }
+    else
+     {
+      return false;
      }
    }
 
@@ -1776,6 +1791,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
       trackingSystem.setBeaconUrlTemplate(smartFoxFacade.configData.beaconTrackerUrl,this);
      }
 
+    socNetSessionFB.setFbAppId(smartFoxFacade.configData.facebookAppId);
     socNetSessionFB.enableSingleSignOn(smartFoxFacade.configData.facebookSSOMode != 0);
 
     webServerUrl = smartFoxFacade.configData.webServerUrl;
@@ -1804,8 +1820,6 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
       offlinePack.setWebServerUrl(webServerUrl);
      }
 
-    fbAppId = smartFoxFacade.configData.facebookAppId;
-
     eventHandlers.beginCall();
 
     try
@@ -1820,6 +1834,13 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     finally
      {
       eventHandlers.endCall();
+     }
+
+    if (fastResumeEnabled && smartFoxFacade.configData.tryFastResumeMode != 0)
+     {
+      fastResumeEnabled = false;
+
+      loginWithStoredCredentials();
      }
    }
 
@@ -2684,16 +2705,9 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
                MNI18n.MESSAGE_CODE_YOU_MUST_NOT_BE_IN_GAMEPLAY_TO_USE_FACEBOOK_CONNECT_ERROR);
      }
 
-    if (fbAppId == null)
-     {
-      return MNI18n.getLocalizedString
-              ("Facebook API key and/or session proxy URL is invalid or not set",
-               MNI18n.MESSAGE_CODE_FACEBOOK_API_KEY_OR_SESSION_PROXY_URL_IS_INVALID_OR_NOT_SET_ERROR);
-     }
-
     socNetSessionFBEventHandler = eventHandler;
 
-    return socNetSessionFB.connect(fbAppId,permissions);
+    return socNetSessionFB.connect(permissions);
    }
 
   public String socNetFBResume  (SocNetFBEventHandler eventHandler)
@@ -2705,16 +2719,9 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
                MNI18n.MESSAGE_CODE_YOU_MUST_NOT_BE_IN_GAMEPLAY_TO_USE_FACEBOOK_CONNECT_ERROR);
      }
 
-    if (fbAppId == null)
-     {
-      return MNI18n.getLocalizedString
-              ("Facebook API key and/or session proxy URL is invalid or not set",
-               MNI18n.MESSAGE_CODE_FACEBOOK_API_KEY_OR_SESSION_PROXY_URL_IS_INVALID_OR_NOT_SET_ERROR);
-     }
-
     socNetSessionFBEventHandler = eventHandler;
 
-    return socNetSessionFB.resume(fbAppId);
+    return socNetSessionFB.resume();
    }
 
   public void socNetFBLogout ()
@@ -2922,6 +2929,16 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     return smartFoxFacade.configData;
    }
 
+  /*package*/ synchronized void setWebShopReady (boolean webShopIsReady)
+   {
+    this.webShopIsReady = webShopIsReady;
+   }
+
+  public synchronized boolean isWebShopReady ()
+   {
+    return webShopIsReady;
+   }
+
   /**
    * Returns game vocabulary object
    * @return game vocabulary object
@@ -2939,7 +2956,6 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
   private SocNetFBEventHandler socNetSessionFBEventHandler;
   private MNVarStorage     varStorage;
   private String           webServerUrl;
-  private String           fbAppId;
 
   private int              status;
   private long             userId;
@@ -2950,6 +2966,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
   private boolean          roomExtraInfoReceived;
   private int              defaultGameSetId;
   private MNGameResult     pendingGameResult;
+  private boolean          fastResumeEnabled;
 
   private MNEventHandlerArray<IMNSessionEventHandler> eventHandlers;
 
@@ -2960,6 +2977,8 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
 
   private long             launchTime;
   private String           launchId;
+
+  private boolean          webShopIsReady;
 
   private MNTrackingSystem trackingSystem;
   private HashMap<String,String> appConfigVars;
@@ -2981,7 +3000,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
   private static final String APP_PROPERTY_VAR_PATH_PREFIX = "prop.";
   private static final int APP_COMMAND_SET_APP_PROPERTY_PREFIX_LEN = APP_COMMAND_SET_APP_PROPERTY_PREFIX.length();
 
-  public static final String CLIENT_API_VERSION = "1_4_6";
+  public static final String CLIENT_API_VERSION = "1_4_7";
 
   private static final String GAME_ZONE_NAME_PREFIX = "Game_";
   private static final String SMARTFOX_EXT_NAME = "MultiNetExtension";

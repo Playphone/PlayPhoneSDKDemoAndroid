@@ -46,6 +46,7 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
     shutdownTrackerUrl = null;
     beaconTrackerUrl   = null;
     gameVocabularyVersion = null;
+    tryFastResumeMode  = 0;
    }
 
   public synchronized void load (IEventHandler eventHandler)
@@ -83,6 +84,7 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
         facebookAPIKey     = parseParamString(params,FACEBOOK_API_KEY_PARAM);
         facebookAppId      = parseParamString(params,FACEBOOK_APP_ID_PARAM);
         facebookSSOMode    = parseParamInteger(params,FACEBOOK_SSO_MODE_PARAM,true,0);
+        tryFastResumeMode  = parseParamInteger(params,TRY_FAST_RESUME_MODE_PARAM,true,0);
         launchTrackerUrl   = params.get(LAUNCH_TRACKER_URL_PARAM);
         shutdownTrackerUrl = params.get(SHUTDOWN_TRACKER_URL_PARAM);
         beaconTrackerUrl   = params.get(BEACON_TRACKER_URL_PARAM);
@@ -255,6 +257,7 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
   public String  beaconTrackerUrl;
   public String  shutdownTrackerUrl;
   public String  gameVocabularyVersion;
+  public int     tryFastResumeMode;
 
   private static final String SMARTFOX_SERVER_ADDR_PARAM   = "SmartFoxServerAddr";
   private static final String SMARTFOX_SERVER_PORT_PARAM   = "SmartFoxServerPort";
@@ -269,5 +272,6 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
   private static final String SHUTDOWN_TRACKER_URL_PARAM   = "ShutdownTrackerURL";
   private static final String BEACON_TRACKER_URL_PARAM     = "BeaconTrackerURL";
   private static final String GAME_VOCABULARY_VERSION_PARAM = "GameVocabularyVersion";
+  private static final String TRY_FAST_RESUME_MODE_PARAM   = "TryFastResumeMode";
  }
 

@@ -547,6 +547,14 @@ class MNVShopInAppBilling implements MNInAppBilling.IEventHandler
        (srvTransactionId,cliTransactionId,itemsToAddStr,vShopTransactionEnabled);
      }
 
+    public void    vShopPostVShopTransactionFailed
+                                             (long   clientTransactionId,
+                                              int    errorCode,
+                                              String errorMessage)
+     {
+      vShopProvider.dispatchCheckoutFailedEvent(errorCode,errorMessage,clientTransactionId);
+     }
+
     public void    vShopFinishTransaction    (String orderId)
      {
       String notificationId = removeOrderNotificationLink(orderId);

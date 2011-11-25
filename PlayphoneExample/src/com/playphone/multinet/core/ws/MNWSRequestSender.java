@@ -33,6 +33,7 @@ import com.playphone.multinet.core.ws.data.MNWSRoomListItem;
 import com.playphone.multinet.core.ws.data.MNWSRoomUserInfoItem;
 import com.playphone.multinet.core.ws.data.MNWSUserGameCookie;
 import com.playphone.multinet.core.ws.data.MNWSSystemGameNetStats;
+import com.playphone.multinet.core.ws.data.MNWSSessionSignedClientToken;
 
 public class MNWSRequestSender
  {
@@ -343,6 +344,14 @@ public class MNWSRequestSender
                      return new MNWSSystemGameNetStats();
                     }
                   });
+    parsers.put("getSessionSignedClientToken",
+                new MNWSXmlGenericItemParser()
+                 {
+                  public MNWSGenericItem createNewItem ()
+                   {
+                    return new MNWSSessionSignedClientToken();
+                   }
+                 });
    }
 
   private MNSession                          session;

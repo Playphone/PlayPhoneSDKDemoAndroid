@@ -31,6 +31,10 @@ class MNVShopWSRequestHelper
                                               long   cliTransactionId,
                                               String itemsToAddStr,
                                               boolean vShopTransactionEnabled);
+    public void    vShopPostVShopTransactionFailed
+                                             (long   clientTransactionId,
+                                              int    errorCode,
+                                              String errorMessage);
     public void    vShopFinishTransaction    (String transactionId);
     public void    vShopWSRequestFailed      (long   clientTransactionId,
                                               int    errorCode,
@@ -245,6 +249,62 @@ class MNVShopWSRequestHelper
      }
    }
 
+  private void processCallVShopTransactionFailCmd (Element cmdElement)
+   {
+    String errorCodeStr        = null;
+    String errorMessage        = null;
+    String cliTransactionIdStr = null;
+
+    Element currElement = MNWSXmlTools.nodeGetFirstChildElement(cmdElement);
+
+    while (currElement != null)
+     {
+      String tagName = currElement.getTagName();
+
+      if      (tagName.equals("errorCode"))
+       {
+        errorCodeStr = MNWSXmlTools.nodeGetTextContent(currElement);
+       }
+      else if (tagName.equals("errorMessage"))
+       {
+        errorMessage = MNWSXmlTools.nodeGetTextContent(currElement);
+       }
+      else if (tagName.equals("clientTransactionId"))
+       {
+        cliTransactionIdStr = MNWSXmlTools.nodeGetTextContent(currElement);
+       }
+      else
+       {
+        session.getPlatform().logWarning(TAG,"unknown element in 'callVShopTransactionFail' command");
+       }
+
+      currElement = MNWSXmlTools.nodeGetNextSiblingElement(currElement);
+     }
+
+    Long    cliTransactionId = null;
+    Integer errorCode        = null;
+
+    if (cliTransactionIdStr != null)
+     {
+      cliTransactionId = MNUtils.parseLong(cliTransactionIdStr);
+     }
+
+    if (errorCodeStr != null)
+     {
+      errorCode = MNUtils.parseInteger(cliTransactionIdStr);
+     }
+
+    if (errorCode != null && errorMessage != null && cliTransactionIdStr != null)
+     {
+      eventHandler.vShopPostVShopTransactionFailed
+       (cliTransactionId,errorCode,errorMessage);
+     }
+    else
+     {
+      session.getPlatform().logWarning(TAG,"required field is absent in 'callVShopTransactionFail' command");
+     }
+   }
+
   private void processWSResponse (String responseStr, long clientTransactionId)
    {
     DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -294,6 +354,10 @@ class MNVShopWSRequestHelper
                   else if (tagName.equals("postPluginMessage"))
                    {
                     processPostPluginMessageCmd(currElement);
+                   }
+                  else if (tagName.equals("callVShopTransactionFail"))
+                   {
+                    processCallVShopTransactionFailCmd(currElement);
                    }
                   else
                    {

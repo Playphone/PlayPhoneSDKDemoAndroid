@@ -11,6 +11,7 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Locale;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +42,10 @@ import android.graphics.Rect;
 import android.graphics.Canvas;
 import android.net.Uri;
 import android.util.Log;
+
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import com.playphone.multinet.MNConst;
 import com.playphone.multinet.MNGameParams;
@@ -762,8 +767,46 @@ public class MNUserProfileView extends FrameLayout
     return false;
    }
 
+  private void getUserABDataExtended (String callbackId)
+   {
+    Collection<MNAddrBookAccess.UserAddressInfo> usersData =
+     MNAddrBookAccess.getAddressBook(getHostActivity().getContentResolver());
+
+    JSONArray addrBookData = new JSONArray();
+
+    for (MNAddrBookAccess.UserAddressInfo userInfo : usersData)
+     {
+      JSONObject userData = new JSONObject();
+
+      try
+       {
+        userData.put("name",userInfo.getName());
+        userData.put("emails",new JSONArray(userInfo.getEmails()));
+        userData.put("phones",new JSONArray(userInfo.getPhones()));
+
+        addrBookData.put(userData);
+       }
+      catch (JSONException e)
+       {
+       }
+     }
+
+    final MNSession session = this.session;
+
+    if (session != null)
+     {
+      session.postSysEvent("sys.getUserAddressBook.Response",
+                           addrBookData.toString(),
+                           callbackId);
+     }
+   }
+
   public void mnSessionWebEventReceived (String eventName, String eventParam, String callbackId)
    {
+    if (eventName.equals("web.getUserAddressBook"))
+     {
+      getUserABDataExtended(callbackId);
+     }
    }
 
   public void mnSessionSysEventReceived (String eventName, String eventParam, String callbackId)
@@ -2002,13 +2045,21 @@ public class MNUserProfileView extends FrameLayout
 
     private void setHostParam (MNAppHostRequestURL url)
      {
+      final MNSession session = MNUserProfileView.this.session;
+
       if (session != null)
        {
         String contextCallWaitLoadParam = url.getStringParam("context_call_wait_load");
+        String webShopIsReadyParam      = url.getStringParam("vshop_is_ready");
 
         if (contextCallWaitLoadParam != null)
          {
           setContextCallWaitLoad(!contextCallWaitLoadParam.equals("0"));
+         }
+
+        if (webShopIsReadyParam != null)
+         {
+          session.setWebShopReady(!webShopIsReadyParam.equals("0"));
          }
        }
      }

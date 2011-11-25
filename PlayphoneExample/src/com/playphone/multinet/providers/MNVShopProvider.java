@@ -12,6 +12,7 @@ import com.playphone.multinet.core.MNUtils;
 import com.playphone.multinet.core.MNSessionEventHandlerAbstract;
 import com.playphone.multinet.core.MNGameVocabulary;
 import com.playphone.multinet.core.MNEventHandlerArray;
+import com.playphone.multinet.core.MNI18n;
 import com.playphone.multinet.core.ws.MNWSXmlTools;
 
 import java.util.ArrayList;
@@ -116,6 +117,7 @@ public class MNVShopProvider
     public static final int ERROR_CODE_XML_STRUCTURE_ERROR = -996;
     public static final int ERROR_CODE_NETWORK_ERROR       = -995;
     public static final int ERROR_CODE_GENERIC             = -994;
+    public static final int ERROR_CODE_WF_NOT_READY        = 200;
    }
 
   /**
@@ -655,10 +657,29 @@ public class MNVShopProvider
                                                    int[] packCountArray,
                                                    long  clientTransactionId)
    {
-    session.execAppCommand("jumpToBuyVShopPackRequestDialogSimple",
-                           "pack_id=" + joinIntegers(packIdArray) + "&" +
-                           "buy_count=" + joinIntegers(packCountArray) + "&" +
-                           "client_transaction_id=" + Long.toString(clientTransactionId));
+    if (session.isWebShopReady())
+     {
+      session.execAppCommand("jumpToBuyVShopPackRequestDialogSimple",
+                             "pack_id=" + joinIntegers(packIdArray) + "&" +
+                             "buy_count=" + joinIntegers(packCountArray) + "&" +
+                             "client_transaction_id=" + Long.toString(clientTransactionId));
+     }
+    else
+     {
+      String errorMessage = session.varStorageGetValueForVariable
+                             ("hook.ui.shop_not_ready_error_message");
+
+      if (errorMessage == null)
+       {
+        errorMessage = MNI18n.getLocalizedString
+                        ("Purchase system is loading. Please retry later.",
+                         MNI18n.MESSAGE_CODE_PURCHASE_SYSTEM_IS_NOT_READY_ERROR);
+
+       }
+
+      dispatchCheckoutFailedEvent
+       (IEventHandler.ERROR_CODE_WF_NOT_READY,errorMessage,clientTransactionId);
+     }
    }
 
   public synchronized void procCheckoutVShopPacksSilent (int[] packIdArray,
@@ -936,6 +957,14 @@ public class MNVShopProvider
      {
       processPostVItemTransactionCmd
        (srvTransactionId,cliTransactionId,itemsToAddStr,vShopTransactionEnabled);
+     }
+
+    public void    vShopPostVShopTransactionFailed
+                                             (long   clientTransactionId,
+                                              int    errorCode,
+                                              String errorMessage)
+     {
+      dispatchCheckoutFailedEvent(errorCode,errorMessage,clientTransactionId);
      }
 
     public void    vShopFinishTransaction    (String transactionId)

@@ -7,7 +7,7 @@
 
 package com.playphone.multinet.core;
 
-class MNI18n
+public class MNI18n
  {
   public static String getLocalizedString (String str, int code)
    {
@@ -34,6 +34,7 @@ class MNI18n
   public static final int MESSAGE_CODE_FACEBOOK_LOGIN_ERROR = MESSAGE_CODE_LOW_BOUND + 38;
   public static final int MESSAGE_CODE_INTERNET_CONNECTION_NOT_AVAILABLE_ERROR = MESSAGE_CODE_LOW_BOUND + 39;
   public static final int MESSAGE_CODE_CANNOT_GET_CONTACT_LIST_ERROR = MESSAGE_CODE_LOW_BOUND + 42;
+  public static final int MESSAGE_CODE_PURCHASE_SYSTEM_IS_NOT_READY_ERROR = MESSAGE_CODE_LOW_BOUND + 44;
 
   public static final int MESSAGE_CODE_OFFLINE_NEED_ONLINE_MODE_ERROR = MESSAGE_CODE_OFFLINE_DOMAIN_LOW_BOUND;
   public static final int MESSAGE_CODE_OFFLINE_CANNOT_LOGIN_OFFLINE_WHILE_CONNECTED_TO_SERVER_ERROR = MESSAGE_CODE_OFFLINE_DOMAIN_LOW_BOUND + 1;

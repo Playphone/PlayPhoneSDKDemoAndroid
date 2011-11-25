@@ -8,6 +8,7 @@
 package com.playphone.multinet.core.ws;
 
 import java.util.HashMap;
+import java.net.URLEncoder;
 
 import com.playphone.multinet.core.MNUtils;
 
@@ -176,6 +177,22 @@ public class MNWSRequestContent
   public String addCurrUserSubscriptionStatusPlayPhone ()
    {
     return addCurrUserSubscriptionStatus(SN_ID_PLAYPHONE);
+   }
+
+  public String addGetSessionSignedClientToken (String payload)
+   {
+    String encodedPayload;
+
+    try
+     {
+      encodedPayload = URLEncoder.encode(payload,"UTF-8");
+     }
+    catch (java.io.UnsupportedEncodingException e)
+     {
+      encodedPayload = "";
+     }
+
+    return addInfoBlock("getSessionSignedClientToken",encodedPayload);
    }
 
   /*package*/ String getRequestInfoListString ()

@@ -11,6 +11,7 @@ import java.net.MalformedURLException;
 import java.io.IOException;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.facebook.android.Facebook;
 
@@ -23,23 +24,77 @@ public class MNSocNetSessionFB
    {
     this.platform     = (MNPlatformAndroid)platform;
     this.eventHandler = eventHandler;
-    this.connecting   = false;
     this.facebook     = null;
    }
 
-  public synchronized String connect (String   applicationId,
-                                      String[] permissions)
+  private static String getPrefNameForFbApp (String prefName, String fbAppId)
    {
-    if (connecting)
+    return prefName + "_" + fbAppId;
+   }
+
+  private void restoreAccessToken ()
+   {
+    String fbAppId = facebook.getAppId();
+    SharedPreferences preferences = platform.getContext().getSharedPreferences
+                                     (FbSSOTokenStorageName,Context.MODE_PRIVATE);
+
+    String accessToken = preferences.getString
+                          (getPrefNameForFbApp("access_token",fbAppId),null);
+    long   expires     = preferences.getLong
+                          (getPrefNameForFbApp("access_expires",fbAppId),0);
+
+    if (accessToken != null)
      {
-      return MNI18n.getLocalizedString
-              ("Facebook connection already have been initiated",
-               MNI18n.MESSAGE_CODE_FACEBOOK_CONNECTION_ALREADY_INITIATED_ERROR);
+      facebook.setAccessToken(accessToken);
      }
 
-    connecting = true;
+    if (expires != 0)
+     {
+      facebook.setAccessExpires(expires);
+     }
+   }
 
-    facebook = new Facebook(applicationId);
+  private synchronized void storeAccessToken ()
+   {
+    String fbAppId = facebook.getAppId();
+    SharedPreferences.Editor editor = platform.getContext().getSharedPreferences
+                                       (FbSSOTokenStorageName,Context.MODE_PRIVATE).edit();
+
+    editor.putString(getPrefNameForFbApp("access_token",fbAppId),
+                     facebook.getAccessToken());
+    editor.putLong(getPrefNameForFbApp("access_expires",fbAppId),
+                     facebook.getAccessExpires());
+
+    editor.commit();
+   }
+
+  private void removeAccessToken()
+   {
+    String fbAppId = facebook.getAppId();
+    SharedPreferences.Editor editor = platform.getContext().getSharedPreferences
+                                       (FbSSOTokenStorageName,Context.MODE_PRIVATE).edit();
+
+    editor.remove(getPrefNameForFbApp("access_token",fbAppId));
+    editor.remove(getPrefNameForFbApp("access_expires",fbAppId));
+
+    editor.commit();
+   }
+
+  public synchronized void setFbAppId (String fbAppId)
+   {
+    facebook = new Facebook(fbAppId);
+
+    restoreAccessToken();
+   }
+
+  public synchronized String connect (String[] permissions)
+   {
+    if (facebook == null)
+     {
+      return MNI18n.getLocalizedString
+              ("Facebook application id is undefined",
+               MNI18n.MESSAGE_CODE_FACEBOOK_API_KEY_OR_SESSION_PROXY_URL_IS_INVALID_OR_NOT_SET_ERROR);
+     }
 
     MNSocNetSessionFBUI.authorize(platform.getContext(),
                                   facebook,
@@ -49,19 +104,18 @@ public class MNSocNetSessionFB
      {
       public void onSuccess ()
        {
-        connecting = false;
+        storeAccessToken();
+
         eventHandler.socNetFBLoginOk(MNSocNetSessionFB.this);
        }
 
       public void onError   (String message)
        {
-        connecting = false;
         eventHandler.socNetFBLoginFailedWithError("Facebook connection failed (" + message + ")");
        }
 
       public void onCancel  ()
        {
-        connecting = false;
         eventHandler.socNetFBLoginCanceled();
        }
      });
@@ -69,15 +123,35 @@ public class MNSocNetSessionFB
     return null;
    }
 
-  public synchronized String resume (String applicationId)
+  public synchronized String resume ()
    {
-    return connect(applicationId,null);
+    if (facebook == null)
+     {
+      return MNI18n.getLocalizedString
+              ("Facebook application id is undefined",
+               MNI18n.MESSAGE_CODE_FACEBOOK_API_KEY_OR_SESSION_PROXY_URL_IS_INVALID_OR_NOT_SET_ERROR);
+     }
+
+    if (facebook.isSessionValid())
+     {
+      eventHandler.socNetFBLoginOk(MNSocNetSessionFB.this);
+
+      return null;
+     }
+    else
+     {
+      return MNI18n.getLocalizedString
+              ("Facebook connection failed (session cannot be resumed)",
+               MNI18n.MESSAGE_CODE_FACEBOOK_CONNECTION_RESUME_FAILED_ERROR);
+     }
    }
 
   public synchronized void logout ()
    {
     if (facebook != null)
      {
+      removeAccessToken();
+
       // logout call is a blocking call, so we have to run it on separate
       // thread to prevent ANR
       final Facebook fb      = facebook;
@@ -99,11 +173,7 @@ public class MNSocNetSessionFB
             }
           }
         }).start();
-
-      facebook = null;
      }
-
-    connecting = false;
    }
 
   public synchronized boolean isConnected ()
@@ -246,7 +316,8 @@ public class MNSocNetSessionFB
   MNPlatformAndroid platform;
   private IEventHandler eventHandler;
   private Facebook facebook;
-  private boolean connecting;
   private boolean useSSO;
+
+  private static final String FbSSOTokenStorageName = "MNFbSSOData";
  }
 
