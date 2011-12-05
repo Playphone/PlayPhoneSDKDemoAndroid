@@ -81,9 +81,17 @@ public class MNTrackingSystem
     Locale                 locale   = Locale.getDefault();
     TimeZone               timeZone = TimeZone.getDefault();
 
+    String phoneId = platform.getUniqueDeviceIdentifier2();
+
+    if (phoneId == null)
+     {
+      phoneId = "";
+     }
+
     HashMap<String,String> vars = new HashMap<String,String>();
 
     vars.put("tv_udid",platform.getUniqueDeviceIdentifier());
+    vars.put("tv_udid2",phoneId);
 //    vars.put("tv_device_name","");
     vars.put("tv_device_type",android.os.Build.MODEL);
     vars.put("tv_os_version",android.os.Build.VERSION.RELEASE);

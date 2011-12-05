@@ -22,11 +22,13 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
 import android.os.Build;
 import android.util.Log;
 
@@ -57,6 +59,27 @@ public class MNPlatformAndroid implements IMNPlatform
     String id = Secure.getString(activity.getContentResolver(),Secure.ANDROID_ID);
 
     return id != null ? id : EMULATOR_UNIQUE_DEVICE_ID;
+   }
+
+  public String getUniqueDeviceIdentifier2 ()
+   {
+    String phoneId = null;
+
+    if (activity.checkCallingOrSelfPermission
+         (Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)
+     {
+      try
+       {
+        phoneId = ((TelephonyManager)activity.getSystemService
+                    (Context.TELEPHONY_SERVICE)).getDeviceId();
+       }
+      catch (Exception e)
+       {
+        phoneId = null;
+       }
+     }
+
+    return phoneId;
    }
 
   private static String replaceBarWithSpace (String s)

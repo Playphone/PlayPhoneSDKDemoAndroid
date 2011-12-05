@@ -529,7 +529,7 @@ public final class MNUtils
       return bodyStringJoiner.toString();
      }
 
-    private static String encodeDataAsUrl (String data)
+    public static String encodeDataAsUrl (String data)
      {
       try
        {

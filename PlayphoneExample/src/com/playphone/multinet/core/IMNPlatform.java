@@ -16,6 +16,7 @@ public interface IMNPlatform
  {
   int              getDeviceType             ();
   String           getUniqueDeviceIdentifier ();
+  String           getUniqueDeviceIdentifier2();
   String           getDeviceInfoString       ();
   String           getMultiNetConfigURL      ();
 

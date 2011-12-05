@@ -76,13 +76,19 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     fastResumeEnabled     = true;
     webShopIsReady        = false;
 
+    String appVerExternal = platform.getAppVerExternal();
+    String appVerInternal = platform.getAppVerInternal();
+
     smartFoxFacade = new MNSmartFoxFacade
                           (platform,
                            platform.getMultiNetConfigURL() +
                             "?game_id=" + Integer.toString(gameId) +
                             "&dev_type=" + Integer.toString(platform.getDeviceType()) +
                             "&client_ver=" + CLIENT_API_VERSION +
-                            "&client_locale=" + Locale.getDefault().toString());
+                            "&client_locale=" + Locale.getDefault().toString() +
+                            "&app_ver_ext=" + (appVerExternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerExternal)) +
+                            "&app_ver_int=" + (appVerInternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerInternal)));
+
     smartFoxFacade.setEventHandler(this);
 
     smartFoxFacade.smartFox.addEventListener(SFSEvent.onPublicMessage,this);

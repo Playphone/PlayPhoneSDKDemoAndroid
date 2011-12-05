@@ -117,18 +117,25 @@ public class MNUserProfileView extends FrameLayout
               trustedHosts.add(baseHost);
              }
 
+            String appVerExternal = session.getPlatform().getAppVerExternal();
+            String appVerInternal = session.getPlatform().getAppVerInternal();
+
             String startUrl = String.format((webServerUrl.startsWith("file:") ? "%s/welcome.php.html?" : "%s/welcome.php?") +
                                             "game_id=%d&" +
                                             "dev_id=%s&" +
                                             "dev_type=%d&" +
                                             "client_ver=%s&" +
-                                            "client_locale=%s",
+                                            "client_locale=%s&" +
+                                            "app_ver_ext=%s&" +
+                                            "app_ver_int=%s",
                                             webServerUrl,
                                             session.getGameId(),
                                             MNUtils.stringGetMD5String(session.getPlatform().getUniqueDeviceIdentifier()),
                                             session.getPlatform().getDeviceType(),
                                             MNSession.CLIENT_API_VERSION,
-                                            Locale.getDefault().toString());
+                                            Locale.getDefault().toString(),
+                                            appVerExternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerExternal),
+                                            appVerInternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerInternal));
 
             errorPageLoaded = false;
 
