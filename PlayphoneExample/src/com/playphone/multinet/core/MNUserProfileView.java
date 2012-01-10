@@ -137,6 +137,13 @@ public class MNUserProfileView extends FrameLayout
                                             appVerExternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerExternal),
                                             appVerInternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerInternal));
 
+            Map<String,String> appExtParams = session.getAppExtParams();
+
+            if (!appExtParams.isEmpty())
+             {
+              startUrl = startUrl + "&" + MNUtils.httpGetRequestBuildParamString(appExtParams);
+             }
+
             errorPageLoaded = false;
 
             webView.loadUrl(startUrl);
@@ -829,6 +836,10 @@ public class MNUserProfileView extends FrameLayout
   public void mnSessionAppStartParamUpdated (String param)
    {
     scheduleUpdateContext();
+   }
+
+  public void mnSessionVShopReadyStatusChanged (boolean isVShopReady)
+   {
    }
 
   /* MNSession.SocNetFBEventHandler */

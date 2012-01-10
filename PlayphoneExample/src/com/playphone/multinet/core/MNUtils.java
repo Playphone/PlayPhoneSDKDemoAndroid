@@ -16,6 +16,7 @@ import java.net.URLEncoder;
 import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.Date;
+import java.util.Map;
 import java.util.HashMap;
 
 import java.io.UnsupportedEncodingException;
@@ -544,6 +545,18 @@ public final class MNUtils
     private StringJoiner bodyStringJoiner;
    }
 
+  public static String httpGetRequestBuildParamString (Map<String,String> params)
+   {
+    HttpPostBodyStringBuilder builder = new HttpPostBodyStringBuilder();
+
+    for (String key : params.keySet())
+     {
+      builder.addParam(key,params.get(key));
+     }
+
+    return builder.toString();
+   }
+
   public static HashMap<String,String> httpGetRequestParseParams (String paramString) throws UnsupportedEncodingException
    {
     HashMap<String,String> result = new HashMap<String,String>();
@@ -574,6 +587,68 @@ public final class MNUtils
      }
 
     return result;
+   }
+
+  public static class StringKeyValuePair
+   {
+    public StringKeyValuePair ()
+     {
+      this.key   = null;
+      this.value = null;
+     }
+
+    public StringKeyValuePair (String key, String value)
+     {
+      this.key   = key;
+      this.value = value;
+     }
+
+    public boolean isEmpty ()
+     {
+      return key == null;
+     }
+
+    public String getKey ()
+     {
+      return key;
+     }
+
+    public String getValue ()
+     {
+      return value;
+     }
+
+    public static boolean parseKeyValueString (StringKeyValuePair dest, String str)
+     {
+      boolean ok = true;
+
+      str = str.trim();
+
+      if (str.length() > 0)
+       {
+        String[] parts = str.split("=",2);
+
+        if (parts.length == 2)
+         {
+          dest.key   = parts[0].trim();
+          dest.value = parts[1].trim();
+         }
+        else
+         {
+          ok = false;
+         }
+       }
+      else
+       {
+        dest.key   = null;
+        dest.value = null;
+       }
+
+      return ok;
+     }
+
+    private String key;
+    private String value;
    }
 
   private static final String REQUEST_ENCODING_DEFAULT = "UTF-8";

@@ -139,5 +139,9 @@ public class MNSessionEventHandlerAbstract implements IMNSessionEventHandler
   public void mnSessionAppStartParamUpdated (String param)
    {
    }
+
+  public void mnSessionVShopReadyStatusChanged (boolean isVShopReady)
+   {
+   }
  }
 

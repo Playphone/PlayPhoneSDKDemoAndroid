@@ -10,11 +10,14 @@ package com.playphone.multinet.core;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -138,7 +141,7 @@ public class MNPlatformAndroid implements IMNPlatform
    {
     try
      {
-      Dictionary<String,String> params = loadMultiNetConfFile();
+      HashMap<String,String> params = loadMultiNetConfFile();
 
       return params.get(MULTINET_CONFIG_URL_PARAM);
      }
@@ -146,6 +149,57 @@ public class MNPlatformAndroid implements IMNPlatform
      {
       return null;
      }
+   }
+
+  public Map<String,String> readAppExtParams ()
+   {
+    Map<String,String> dict = null;
+
+    try
+     {
+      BufferedReader reader   = null;
+      InputStream inputStream = null;
+
+      try
+       {
+        inputStream = activity.getResources().getAssets().open(MULTINET_APPEXT_PARAMS_FILENAME);
+        dict = new HashMap<String,String>();
+        MNUtils.StringKeyValuePair keyValuePair = new MNUtils.StringKeyValuePair();
+
+        reader = new BufferedReader
+                      (new InputStreamReader(inputStream,Charset.forName("UTF-8")));
+
+        String line = reader.readLine();
+
+        while (line != null)
+         {
+          if (MNUtils.StringKeyValuePair.parseKeyValueString(keyValuePair,line) &&
+              !keyValuePair.isEmpty())
+           {
+            dict.put(MULTINET_APPEXT_PARAMS_PREFIX + keyValuePair.getKey(),
+                     keyValuePair.getValue());
+           }
+
+          line = reader.readLine();
+         }
+       }
+      finally
+       {
+        if (reader != null)
+         {
+          reader.close();
+         }
+        else if (inputStream != null)
+         {
+          inputStream.close();
+         }
+       }
+     }
+    catch (IOException e)
+     {
+     }
+
+    return dict != null ? dict : new HashMap<String,String>();
    }
 
   public InputStream  openFileForInput  (String path) throws FileNotFoundException
@@ -208,9 +262,9 @@ public class MNPlatformAndroid implements IMNPlatform
     return baseView;
    }
 
-  private Dictionary<String,String> loadMultiNetConfFile () throws MNException
+  private HashMap<String,String> loadMultiNetConfFile () throws MNException
    {
-    Dictionary<String,String> dict = null;
+    HashMap<String,String> dict = null;
 
     try
      {
@@ -219,7 +273,7 @@ public class MNPlatformAndroid implements IMNPlatform
 
       try
        {
-        dict = loadMultiNetConfFile(inputStream);
+        dict = loadPListFile(inputStream);
        }
       finally
        {
@@ -234,9 +288,14 @@ public class MNPlatformAndroid implements IMNPlatform
     return dict;
    }
 
-  private Dictionary<String,String> loadMultiNetConfFile (InputStream source) throws MNException
+  private HashMap<String,String> loadPListFile (InputStream source) throws MNException
    {
-    Hashtable<String,String> dict = new Hashtable<String,String>();
+    return loadPListFile(source,null);
+   }
+
+  private HashMap<String,String> loadPListFile (InputStream source, String keyPrefix) throws MNException
+   {
+    HashMap<String,String> dict = new HashMap<String,String>();
 
     try
      {
@@ -350,7 +409,7 @@ public class MNPlatformAndroid implements IMNPlatform
             throw new MNException(MULTINET_CONF_FILE_ERROR);
            }
 
-          dict.put(key,value);
+          dict.put(keyPrefix == null ? key : keyPrefix + key,value);
          }
        }
      }
@@ -388,6 +447,8 @@ public class MNPlatformAndroid implements IMNPlatform
   private static final String TIMEZONE_ABBR_NOT_AVAILABLE = "*";
 
   private static final String MULTINET_CONF_FILENAME   = "multinet.plist";
+  private static final String MULTINET_APPEXT_PARAMS_FILENAME = "multinet_appext.ini";
+  private static final String MULTINET_APPEXT_PARAMS_PREFIX = "appext_";
   private static final String MULTINET_CONF_FILE_ERROR = "MultiNet connection settings could not be read. Error in MultiNet.plist file.";
 
   private static final String MULTINET_CONFIG_URL_PARAM = "MultiNetConfigServerURL";

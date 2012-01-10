@@ -76,18 +76,9 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     fastResumeEnabled     = true;
     webShopIsReady        = false;
 
-    String appVerExternal = platform.getAppVerExternal();
-    String appVerInternal = platform.getAppVerInternal();
+    appExtParams = platform.readAppExtParams();
 
-    smartFoxFacade = new MNSmartFoxFacade
-                          (platform,
-                           platform.getMultiNetConfigURL() +
-                            "?game_id=" + Integer.toString(gameId) +
-                            "&dev_type=" + Integer.toString(platform.getDeviceType()) +
-                            "&client_ver=" + CLIENT_API_VERSION +
-                            "&client_locale=" + Locale.getDefault().toString() +
-                            "&app_ver_ext=" + (appVerExternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerExternal)) +
-                            "&app_ver_int=" + (appVerInternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerInternal)));
+    smartFoxFacade = new MNSmartFoxFacade(platform,buildConfigRequestUrl());
 
     smartFoxFacade.setEventHandler(this);
 
@@ -104,7 +95,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
 
     varStorage = new MNVarStorage(platform,VAR_STORAGE_FILE_NAME);
 
-    offlinePack = new MNOfflinePack(platform,gameId,this);
+    offlinePack = new MNOfflinePack(platform,gameId,appExtParams,this);
 
     webServerUrl = null;
     launchParam  = null;
@@ -116,6 +107,30 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     appConfigVars  = new HashMap<String,String>();
 
     gameVocabulary = new MNGameVocabulary(this);
+   }
+
+  private String buildConfigRequestUrl ()
+   {
+    String appVerExternal = platform.getAppVerExternal();
+    String appVerInternal = platform.getAppVerInternal();
+
+    StringBuilder url = new StringBuilder(platform.getMultiNetConfigURL());
+
+    url.append("?game_id="); url.append(Integer.toString(gameId));
+    url.append("&dev_type="); url.append(Integer.toString(platform.getDeviceType()));
+    url.append("&client_ver="); url.append(CLIENT_API_VERSION);
+    url.append("&client_locale="); url.append(Locale.getDefault().toString());
+    url.append("&app_ver_ext="); url.append(appVerExternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerExternal));
+    url.append("&app_ver_int="); url.append(appVerInternal == null ? "" : MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerInternal));
+
+    if (!appExtParams.isEmpty())
+     {
+      String appExtParamsQuery = MNUtils.httpGetRequestBuildParamString(appExtParams);
+
+      url.append("&"); url.append(appExtParamsQuery);
+     }
+
+    return url.toString();
    }
 
   public static String makeGameSecretByComponents (int secret1, int secret2, int secret3, int secret4)
@@ -2938,6 +2953,27 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
   /*package*/ synchronized void setWebShopReady (boolean webShopIsReady)
    {
     this.webShopIsReady = webShopIsReady;
+
+    eventHandlers.beginCall();
+
+    try
+     {
+      int count = eventHandlers.size();
+
+      for (int index = 0; index < count; index++)
+       {
+        eventHandlers.get(index).mnSessionVShopReadyStatusChanged(webShopIsReady);
+       }
+     }
+    finally
+     {
+      eventHandlers.endCall();
+     }
+   }
+
+  /* package */ Map<String,String> getAppExtParams ()
+   {
+    return appExtParams;
    }
 
   public synchronized boolean isWebShopReady ()
@@ -2988,6 +3024,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
 
   private MNTrackingSystem trackingSystem;
   private HashMap<String,String> appConfigVars;
+  private final Map<String,String> appExtParams;
 
   public static final int  MN_LOBBY_ROOM_ID_UNDEFINED = -1;
   public static final int  MN_ROOM_ID_UNDEFINED       = -1;
@@ -3006,7 +3043,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
   private static final String APP_PROPERTY_VAR_PATH_PREFIX = "prop.";
   private static final int APP_COMMAND_SET_APP_PROPERTY_PREFIX_LEN = APP_COMMAND_SET_APP_PROPERTY_PREFIX.length();
 
-  public static final String CLIENT_API_VERSION = "1_4_7";
+  public static final String CLIENT_API_VERSION = "1_4_8";
 
   private static final String GAME_ZONE_NAME_PREFIX = "Game_";
   private static final String SMARTFOX_EXT_NAME = "MultiNetExtension";

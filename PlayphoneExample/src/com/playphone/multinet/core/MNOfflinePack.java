@@ -8,6 +8,7 @@
 package com.playphone.multinet.core;
 
 import java.util.Locale;
+import java.util.Map;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,12 +27,26 @@ class MNOfflinePack implements MNURLTextDownloader.IEventHandler,
     void onOfflinePackUnavailable    (String error);
    }
 
-  public MNOfflinePack (IMNPlatform platform, int gameId, IEventHandler eventHandler)
+  public MNOfflinePack (IMNPlatform platform, int gameId, Map<String,String> appExtParams, IEventHandler eventHandler)
    {
-    this.platform     = platform;
-    this.gameId       = gameId;
-    this.rootDir      = platform.getMultiNetRootDir();
-    this.eventHandler = eventHandler;
+    this.platform       = platform;
+    this.gameId         = gameId;
+    this.rootDir        = platform.getMultiNetRootDir();
+    this.eventHandler   = eventHandler;
+    this.appExtParams   = appExtParams;
+
+    this.appVerExternal = platform.getAppVerExternal();
+    this.appVerInternal = platform.getAppVerInternal();
+
+    if (appVerExternal == null)
+     {
+      appVerExternal = "";
+     }
+
+    if (appVerInternal == null)
+     {
+      appVerInternal = "";
+     }
 
     startPageUrl = null;
     webServerUrl = null;
@@ -189,13 +204,23 @@ class MNOfflinePack implements MNURLTextDownloader.IEventHandler,
 
   private String createURLRequestWithPath (String path)
    {
-    return String.format("%s/%s?game_id=%d&dev_type=%d&client_ver=%s&client_locale=%s",
-                         webServerUrl,
-                         path,
-                         gameId,
-                         platform.getDeviceType(),
-                         MNSession.CLIENT_API_VERSION,
-                         Locale.getDefault().toString());
+    String url = String.format
+                  ("%s/%s?game_id=%d&dev_type=%d&client_ver=%s&client_locale=%s&app_ver_ext=%s&app_ver_int=%s",
+                   webServerUrl,
+                   path,
+                   gameId,
+                   platform.getDeviceType(),
+                   MNSession.CLIENT_API_VERSION,
+                   Locale.getDefault().toString(),
+                   MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerExternal),
+                   MNUtils.HttpPostBodyStringBuilder.encodeDataAsUrl(appVerInternal));
+
+    if (!appExtParams.isEmpty())
+     {
+      url = url + "&" + MNUtils.httpGetRequestBuildParamString(appExtParams);
+     }
+
+    return url;
    }
 
   private void requestRemotePackVersion ()
@@ -880,6 +905,8 @@ class MNOfflinePack implements MNURLTextDownloader.IEventHandler,
   private File          rootDir;
   private int           gameId;
   private IEventHandler eventHandler;
+  private String        appVerExternal;
+  private String        appVerInternal;
 
   private MNURLTextDownloader     textDownloader;
   private MNURLFileDownloader     fileDownloader;
@@ -892,6 +919,8 @@ class MNOfflinePack implements MNURLTextDownloader.IEventHandler,
   private boolean       startFromDownloadedPack;
   private boolean       packUnavailable;
   private boolean       waitingForServerUrl;
+
+  private final Map<String,String> appExtParams;
 
   private static final int RETRIEVAL_STATE_IDLE    = 0;
   private static final int RETRIEVAL_STATE_VERSION = 1;

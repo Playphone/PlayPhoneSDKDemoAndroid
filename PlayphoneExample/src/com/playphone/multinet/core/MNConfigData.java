@@ -130,24 +130,15 @@ class MNConfigData implements MNURLTextDownloader.IEventHandler
     int count  = content.length;
     boolean ok = true;
     String   line;
-    String[] parts;
+    MNUtils.StringKeyValuePair keyValuePair = new MNUtils.StringKeyValuePair();
 
     while (index < count && ok)
      {
-      line = content[index].trim();
+      ok = MNUtils.StringKeyValuePair.parseKeyValueString(keyValuePair,content[index]);
 
-      if (line.length() > 0)
+      if (ok && !keyValuePair.isEmpty())
        {
-        parts = line.split("=",2);
-
-        if (parts.length == 2)
-         {
-          result.put(parts[0].trim(),parts[1].trim());
-         }
-        else
-         {
-          ok = false;
-         }
+        result.put(keyValuePair.getKey(),keyValuePair.getValue());
        }
 
       index++;

@@ -48,15 +48,20 @@ public class MNWSRequestSender
 
   public IMNWSRequest sendWSRequest           (MNWSRequestContent content, IMNWSRequestEventHandler eventHandler)
    {
-    return sendWSRequest(content,eventHandler,false);
+    return sendWSRequest(content,eventHandler,false,false);
    }
 
   public IMNWSRequest sendWSRequestAuthorized (MNWSRequestContent content, IMNWSRequestEventHandler eventHandler)
    {
-    return sendWSRequest(content,eventHandler,true);
+    return sendWSRequest(content,eventHandler,true,false);
    }
 
-  private IMNWSRequest sendWSRequest (MNWSRequestContent content, IMNWSRequestEventHandler eventHandler, boolean authorized)
+  public IMNWSRequest sendWSRequestSmartAuth (MNWSRequestContent content, IMNWSRequestEventHandler eventHandler)
+   {
+    return sendWSRequest(content,eventHandler,true,true);
+   }
+
+  private IMNWSRequest sendWSRequest (MNWSRequestContent content, IMNWSRequestEventHandler eventHandler, boolean authorized, boolean smartAuth)
    {
     String webServerUrl = session != null ? session.getWebServerURL() : null;
 
@@ -73,6 +78,11 @@ public class MNWSRequestSender
      }
 
     String userSId = session.getMySId();
+
+    if (smartAuth)
+     {
+      authorized = userSId != null;
+     }
 
     if (authorized && userSId == null)
      {

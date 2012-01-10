@@ -236,5 +236,11 @@ public interface IMNSessionEventHandler
    * @param param launch parameter
    */
   void mnSessionAppStartParamUpdated     (String param);
+
+  /**
+   * Invoked when virtual shop ready status has been changed
+   * @param isVShopReady true if virtual shop is ready to purchase operations, false - otherwise
+   */
+  void mnSessionVShopReadyStatusChanged (boolean isVShopReady);
  }
 

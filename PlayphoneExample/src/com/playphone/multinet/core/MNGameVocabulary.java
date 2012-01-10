@@ -8,6 +8,7 @@
 package com.playphone.multinet.core;
 
 import java.util.Locale;
+import java.util.Map;
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -151,6 +152,19 @@ public class MNGameVocabulary
     postBodyBuilder.addParam("dev_type",Integer.toString(session.getPlatform().getDeviceType()));
     postBodyBuilder.addParam("client_ver",MNSession.CLIENT_API_VERSION);
     postBodyBuilder.addParam("client_locale",Locale.getDefault().toString());
+
+    String appVerExternal = session.getPlatform().getAppVerExternal();
+    String appVerInternal = session.getPlatform().getAppVerInternal();
+
+    postBodyBuilder.addParam("app_ver_ext",appVerExternal != null ? appVerExternal : "");
+    postBodyBuilder.addParam("app_ver_int",appVerInternal != null ? appVerInternal : "");
+
+    Map<String,String> appExtParams = session.getAppExtParams();
+
+    for (String key : appExtParams.keySet())
+     {
+      postBodyBuilder.addParam(key,appExtParams.get(key));
+     }
 
     return postBodyBuilder.toString();
    }

@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileNotFoundException;
 
+import java.util.Map;
+
 public interface IMNPlatform
  {
   int              getDeviceType             ();
@@ -22,6 +24,8 @@ public interface IMNPlatform
 
   String           getAppVerExternal         ();
   String           getAppVerInternal         ();
+
+  Map<String,String> readAppExtParams        ();
 
   InputStream      openFileForInput          (String path) throws FileNotFoundException;
   OutputStream     openFileForOutput         (String path) throws FileNotFoundException;

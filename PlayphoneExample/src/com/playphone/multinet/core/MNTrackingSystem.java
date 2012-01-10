@@ -116,6 +116,8 @@ public class MNTrackingSystem
                           "+*+" +
                           timeZone.getID().replace('|',' ').replace(',','-'));
 
+    vars.putAll(session.getAppExtParams());
+
     return vars;
    }
 

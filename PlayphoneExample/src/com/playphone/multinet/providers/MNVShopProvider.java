@@ -66,6 +66,12 @@ public class MNVShopProvider
      */
     void onCheckoutVShopPackFail (CheckoutVShopPackFailInfo result);
 
+    /**
+     * Invoked when virtual shop ready status has been changed
+     * @param isVShopReady true if virtual shop is ready to purchase operations, false - otherwise
+     */
+    void onVShopReadyStatusChanged (boolean isVShopReady);
+
     public static class CheckoutVShopPackSuccessInfo
      {
       public CheckoutVShopPackSuccessInfo (MNVItemsProvider.TransactionInfo transaction)
@@ -143,6 +149,10 @@ public class MNVShopProvider
      }
 
     public void onCheckoutVShopPackFail (CheckoutVShopPackFailInfo result)
+     {
+     }
+
+    public void onVShopReadyStatusChanged (boolean isVShopReady)
      {
      }
    }
@@ -743,6 +753,15 @@ public class MNVShopProvider
     inAppBilling.setInAppBillingActivityManager(manager);
    }
 
+  /**
+   * Returns status of virtual shop
+   * @return true if virtual shop is ready to purchase operations, false - otherwise
+   **/
+  public boolean isVShopReady ()
+   {
+    return session.isWebShopReady();
+   }
+
   private void onVShopPackListUpdated ()
    {
     eventHandlers.callHandlers(new MNEventHandlerArray.ICaller<IEventHandler>()
@@ -870,6 +889,17 @@ public class MNVShopProvider
           dispatchCheckoutFailedEvent(errorCode,errorMessage,cliTransactionId);
          }
        }
+     }
+
+    public void mnSessionVShopReadyStatusChanged (final boolean isVShopReady)
+     {
+      eventHandlers.callHandlers(new MNEventHandlerArray.ICaller<IEventHandler>()
+       {
+        public void callHandler (IEventHandler handler)
+         {
+          handler.onVShopReadyStatusChanged(isVShopReady);
+         }
+       });
      }
    }
 

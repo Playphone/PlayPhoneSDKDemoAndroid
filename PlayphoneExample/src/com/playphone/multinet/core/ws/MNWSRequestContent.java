@@ -169,7 +169,7 @@ public class MNWSRequestContent
                         MNUtils.stringMakeIntList(cookieKeyList,"^"));
    }
 
-  protected String addCurrUserSubscriptionStatus (int socNetId)
+  public String addCurrUserSubscriptionStatus (int socNetId)
    {
     return addInfoBlock("currentUserSubscriptionStatus",Integer.toString(socNetId));
    }
@@ -208,6 +208,6 @@ public class MNWSRequestContent
   private StringBuilder          infoList;
   private HashMap<String,String> mapping;
 
-  private static final int SN_ID_PLAYPHONE = 4;
+  public static final int SN_ID_PLAYPHONE = 4;
  }
 
