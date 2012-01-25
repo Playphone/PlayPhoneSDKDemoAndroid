@@ -885,8 +885,17 @@ public class MNUserProfileView extends FrameLayout
     fbLoginCancelJS  = null;
    }
 
+  @SuppressWarnings("deprecation")
   private void initialize (Context context)
    {
+    try
+     {
+      WebView.enablePlatformNotifications();
+     }
+    catch (Exception e)
+     {
+     }
+
     LinearLayout webViewLayout = new LinearLayout(context);
 
     webViewLayout.setOrientation(LinearLayout.VERTICAL);
