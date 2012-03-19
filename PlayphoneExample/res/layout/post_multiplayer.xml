@@ -41,7 +41,7 @@
                 android:layout_alignParentRight="true"
                 android:text="+10 score" />
         </RelativeLayout>
-
+
         <Button
             android:id="@+id/postScoreButton"
             android:layout_width="match_parent"
@@ -53,8 +53,8 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="30dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:text="Score : 0" />
 
         <TextView
@@ -90,6 +90,14 @@
             android:layout_height="wrap_content"
             android:text="Back to Lobby" >
         </Button>
+
+        <Button
+            android:id="@+id/btnPing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ping Opponent(s)" >
+        </Button>
     </LinearLayout>
 
 </LinearLayout>
+

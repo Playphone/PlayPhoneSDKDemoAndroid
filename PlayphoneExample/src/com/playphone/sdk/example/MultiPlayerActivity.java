@@ -8,6 +8,7 @@ import com.playphone.multinet.MNConst;
 import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.MNDirectUIHelper;
 import com.playphone.multinet.MNGameParams;
+import com.playphone.multinet.MNUserInfo;
 import com.playphone.multinet.MNScoreProgressHelper;
 import com.playphone.multinet.core.MNSession;
 import com.playphone.multinet.core.MNSessionEventHandlerAbstract;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MultiPlayerActivity extends CustomTitleActivity implements
 		OnClickListener, Callback {
@@ -40,6 +42,10 @@ public class MultiPlayerActivity extends CustomTitleActivity implements
 	Button btnUpload;
 	TextView txtResult;
 	Button btnBack;
+        Button btnPing;
+
+        private static final String PingRequestPrefix  = "PING:";
+        private static final String PingResponsePrefix = "PONG:";
 
 	long currentScore = 0;
 	
@@ -83,6 +89,37 @@ public class MultiPlayerActivity extends CustomTitleActivity implements
 			handler.sendEmptyMessage(ON_CANCEL_GAME_EVENT);
 			handler.sendEmptyMessage(ON_GAME_STATUS_CHANGED_EVENT);
 		}
+
+                @Override
+                public void mnSessionGameMessageReceived (String      message,
+                                                          MNUserInfo sender) {
+                        if (message.startsWith(PingRequestPrefix)) {
+                                MNDirect.sendGameMessage(PingResponsePrefix + message.substring(PingRequestPrefix.length()));
+                        }
+                        else if (message.startsWith(PingResponsePrefix)) {
+                                long currentTime = System.currentTimeMillis();
+
+                                try {
+                                     long sendTime = Long.parseLong(message.substring(PingResponsePrefix.length()));
+                                     final long roundTrip = currentTime - sendTime;
+
+                                     final String senderInfo = (sender != null && sender.userName != null) ? sender.userName : "???";
+
+                                     runOnUiThread(new Runnable() {
+                                             public void run () {
+                                                     long halfTime  = roundTrip / 2;
+                                                     String message = String.format("Ping resp. from %s\nDevice-Device time: %d",
+                                                                                     senderInfo,halfTime);
+
+                                                     Toast.makeText(MultiPlayerActivity.this,message,Toast.LENGTH_LONG).show();
+                                             }
+                                     });
+                                }
+                                catch (Exception e) {
+				        Log.d("MultiPlayerActivity","ping response has invalid format: " + message);
+                                }
+                        }
+                }
 	}
 
 	SessionEventHandler eh = new SessionEventHandler();
@@ -107,6 +144,9 @@ public class MultiPlayerActivity extends CustomTitleActivity implements
 		btnUpload = (Button) findViewById(R.id.btnUpload);
 		txtResult = (TextView) findViewById(R.id.txtResult);
 		btnBack = (Button) findViewById(R.id.btnBack);
+		btnPing = (Button) findViewById(R.id.btnPing);
+
+                btnPing.setVisibility(View.GONE);
 
 		minusScoreButton.setOnClickListener(this);
 		plusScoreButton.setOnClickListener(this);
@@ -114,6 +154,14 @@ public class MultiPlayerActivity extends CustomTitleActivity implements
 		btnBack.setOnClickListener(this);
 		postScoreButton.setOnClickListener(this);
 
+                btnPing.setOnClickListener(new View.OnClickListener()
+                 {
+                  public void onClick (View v)
+                   {
+                    MNDirect.sendGameMessage("PING:" + Long.toString(System.currentTimeMillis()));
+                   }
+                 });
+ 
 		if (MNDirect.isUserLoggedIn()) {
 			handler.sendEmptyMessage(ON_START_GAME_EVENT);
 		}
@@ -272,3 +320,4 @@ public class MultiPlayerActivity extends CustomTitleActivity implements
 		return true;
 	}
 }
+
