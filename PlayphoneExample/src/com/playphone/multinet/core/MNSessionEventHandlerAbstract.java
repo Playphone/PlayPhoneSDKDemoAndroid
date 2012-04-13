@@ -91,6 +91,10 @@ public class MNSessionEventHandlerAbstract implements IMNSessionEventHandler
    {
    }
 
+  public void mnSessionSocNetTokenStatusChanged (int socNetId, AuthTokenChangedEvent eventData)
+   {
+   }
+
   public void mnSessionErrorOccurred (MNErrorInfo errorInfo)
    {
    }
@@ -137,6 +141,10 @@ public class MNSessionEventHandlerAbstract implements IMNSessionEventHandler
    }
 
   public void mnSessionAppStartParamUpdated (String param)
+   {
+   }
+
+  public void mnSessionAppBeaconResponseReceived (MNAppBeaconResponse beaconResponse)
    {
    }
 

@@ -72,6 +72,8 @@ class MNVShopWSRequestHelper
       onRequestFailed(clientTransactionId,
                       MNVShopProvider.IEventHandler.ERROR_CODE_NETWORK_ERROR,
                       "user is not logged in");
+
+      return;
      }
 
     postBody.addParam("ctx_game_id",Integer.toString(session.getGameId()));
@@ -79,8 +81,7 @@ class MNVShopWSRequestHelper
     postBody.addParam("ctx_user_id",Long.toString(session.getMyUserId()));
     postBody.addParam("ctx_user_sid",userSId);
     postBody.addParam("ctx_dev_type",Integer.toString(session.getPlatform().getDeviceType()));
-    postBody.addParam("ctx_dev_id",MNUtils.stringGetMD5String
-                                    (session.getPlatform().getUniqueDeviceIdentifier()));
+    postBody.addParam("ctx_dev_id",MNUtils.stringGetMD5String(session.getUniqueAppId()));
     postBody.addParam("ctx_client_ver",MNSession.CLIENT_API_VERSION);
 
     requests.sendRequest(url,postBody.toString(),clientTransactionId);
@@ -103,7 +104,7 @@ class MNVShopWSRequestHelper
     else
      {
       session.getPlatform().logWarning
-       (TAG,"invalid paremeters in 'postVItemTransaction' command");
+       (TAG,"src transaction id not found in 'postFinishTransaction' command");
      }
    }
 
@@ -166,7 +167,7 @@ class MNVShopWSRequestHelper
     else
      {
       session.getPlatform().logWarning
-       (TAG,"invalid paremeters in 'postVItemTransaction' command");
+       (TAG,"invalid parameters in 'postVItemTransaction' command");
      }
    }
 

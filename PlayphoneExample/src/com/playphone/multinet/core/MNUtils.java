@@ -18,6 +18,8 @@ import java.security.MessageDigest;
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Random;
+import java.security.SecureRandom;
 
 import java.io.UnsupportedEncodingException;
 
@@ -119,7 +121,7 @@ public final class MNUtils
    {
     final Object replacePairs[][] =
      {
-      { '\\', "\\\\"  }, { '\r', "\\r"   }, { '\n', "\\n "  },
+      { '\\', "\\\\"  }, { '\r', "\\r"   }, { '\n', "\\n"   },
       { '\t', "\\t"   }, { '\"', "\\x22" }, { '\'', "\\x27" },
       {  '&', "\\x26" }, {  '<', "\\x3C" }, {  '>', "\\x3E" }
      };
@@ -379,6 +381,38 @@ public final class MNUtils
      }
 
     return result;
+   }
+
+  public static String randomBytesAsHexString (int byteCount)
+   {
+    SecureRandom  rng        = new SecureRandom();
+    byte[]        randomData = new byte[byteCount];
+
+    rng.nextBytes(randomData);
+
+    StringBuilder builder = new StringBuilder();
+
+    for (byte byteValue : randomData)
+     {
+      builder.append(String.format("%02x",byteValue));
+     }
+
+    return builder.toString();
+   }
+
+  public static String generateUniqueId ()
+   {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append(randomBytesAsHexString(8));
+    builder.append(':');
+    builder.append(Long.toString(System.currentTimeMillis() / 1000));
+    builder.append(':');
+    builder.append(Long.toString(System.nanoTime()));
+    builder.append(':');
+    builder.append(Integer.toString((new Random()).nextInt()));
+
+    return stringGetMD5String(builder.toString());
    }
 
   public static String readInputStreamContent (InputStream inputStream) throws IOException

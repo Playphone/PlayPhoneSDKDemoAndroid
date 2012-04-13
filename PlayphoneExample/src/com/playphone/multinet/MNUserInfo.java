@@ -70,6 +70,6 @@ public class MNUserInfo
    }
 
   private String webBaseUrl;
-  private String AVATAR_URL_SUFFIX = "user_image_data.php?sn_id=0&user_id=";
+  private final String AVATAR_URL_SUFFIX = "user_image_data.php?sn_id=0&user_id=";
  }
 

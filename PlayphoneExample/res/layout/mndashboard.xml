@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#70000000">
+
+    <RelativeLayout
+        android:id="@+id/mnwfview_bg"
+        android:layout_width="310dp"
+        android:layout_height="230dp"
+        android:background="@drawable/mn_dashboard_bg" android:layout_centerInParent="true">
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mnwfview"
+        android:layout_width="300dp"
+        android:layout_height="220dp" android:layout_centerInParent="true">
+    </RelativeLayout>
+
+</RelativeLayout>

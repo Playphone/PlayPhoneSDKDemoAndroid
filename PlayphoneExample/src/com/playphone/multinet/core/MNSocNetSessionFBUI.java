@@ -7,6 +7,8 @@
 
 package com.playphone.multinet.core;
 
+import java.util.Map;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
@@ -21,7 +23,7 @@ class MNSocNetSessionFBUI
  {
   public static interface IFBDialogEventHandler
    {
-    void onSuccess ();
+    void onSuccess (Bundle response);
     void onError   (String message);
     void onCancel  ();
    }
@@ -71,6 +73,22 @@ class MNSocNetSessionFBUI
      }
    }
 
+  public static void showGenericDialog (Context  context,
+                                        Facebook facebook,
+                                        String   action,
+                                        Map<String,String> params,
+                                        IFBDialogEventHandler dialogEventHandler)
+   {
+    GenericDialogActivityEventHandler eventHandler =
+     new GenericDialogActivityEventHandler
+          (facebook,action,params,dialogEventHandler);
+
+    if (!MNProxyActivity.startProxyActivity(context,eventHandler))
+     {
+      eventHandler.cleanup();
+     }
+   }
+
   private abstract static class ActivityEventHandlerBase extends MNProxyActivity.ActivityDelegate implements Facebook.DialogListener
    {
     public ActivityEventHandlerBase (Facebook facebook, IFBDialogEventHandler dialogEventHandler)
@@ -93,7 +111,7 @@ class MNSocNetSessionFBUI
       executeFacebookCall();
      }
 
-    public void cleanup ()
+    public synchronized void cleanup ()
      {
       facebook           = null;
       dialogEventHandler = null;
@@ -105,27 +123,43 @@ class MNSocNetSessionFBUI
       cleanup();
      }
 
-    public void onComplete(Bundle values)
+    public synchronized void onComplete(Bundle values)
      {
-      dialogEventHandler.onSuccess();
+      if (dialogEventHandler != null)
+       {
+        dialogEventHandler.onSuccess(values);
+       }
+
       activity.finish();
      }
 
-    public void onFacebookError(FacebookError e)
+    public synchronized void onFacebookError(FacebookError e)
      {
-      dialogEventHandler.onError(e.toString());
+      if (dialogEventHandler != null)
+       {
+        dialogEventHandler.onError(e.toString());
+       }
+
       activity.finish();
      }
 
-    public void onError(DialogError e)
+    public synchronized void onError(DialogError e)
      {
-      dialogEventHandler.onError(e.toString());
+      if (dialogEventHandler != null)
+       {
+        dialogEventHandler.onError(e.toString());
+       }
+
       activity.finish();
      }
 
-    public void onCancel()
+    public synchronized void onCancel()
      {
-      dialogEventHandler.onCancel();
+      if (dialogEventHandler != null)
+       {
+        dialogEventHandler.onCancel();
+       }
+
       activity.finish();
      }
 
@@ -221,6 +255,33 @@ class MNSocNetSessionFBUI
      }
 
     private String permissions;
+   }
+
+  private static class GenericDialogActivityEventHandler extends ActivityEventHandlerBase
+   {
+    public GenericDialogActivityEventHandler (Facebook              facebook,
+                                              String                action,
+                                              Map<String,String>    params,
+                                              IFBDialogEventHandler dialogEventHandler)
+     {
+      super(facebook,dialogEventHandler);
+
+      this.action = action;
+      this.params = new Bundle();
+
+      for (String key : params.keySet())
+       {
+        this.params.putString(key,params.get(key));
+       }
+     }
+
+    protected void executeFacebookCall ()
+     {
+      facebook.dialog(activity,action,params,this);
+     }
+
+    private String action;
+    private Bundle params;
    }
  }
 

@@ -12,6 +12,7 @@ import java.lang.ref.WeakReference;
 import com.playphone.multinet.MNDirectUIHelper.IEventHandler;
 import com.playphone.multinet.core.MNSession;
 import com.playphone.multinet.core.MNSessionEventHandlerAbstract;
+import com.playphone.multinet.providers.MNVShopProvider;
 
 import android.app.Activity;
 import android.content.Context;
@@ -70,6 +71,19 @@ public class MNDirectButton  {
 	private static WeakReference<Activity> binderActivityRef = new WeakReference<Activity>(null);
 	protected static ImageView networkStatus = null;
 	protected static int visibilityMode = View.VISIBLE;
+	
+	static class VSEventHandler extends MNVShopProvider.EventHandlerAbstract
+    {
+		@Override
+		public void showDashboard() {
+			MNDirectUIHelper.showDashboard();
+		}
+
+		@Override
+		public void hideDashboard() {
+			MNDirectUIHelper.hideDashboard();
+		}
+	}
 	
 	protected static class Helper {
 		private static Context context;
@@ -239,7 +253,35 @@ public class MNDirectButton  {
 		return id;
 	}
 	
+	private static  boolean isVShopEventAutoHandleEnabled = true;
+	
+	public static void setVShopEventAutoHandleEnabled(boolean isEnabled) {
+		isVShopEventAutoHandleEnabled = isEnabled;
+	}
+	
 	private static EventHandler sessionEventHandler = new EventHandler();
+	private static VSEventHandler vsEventHandler = new VSEventHandler();
+	
+	private static void removeHandlers  () {
+		final MNSession session = MNDirect.getSession();
+		if (session != null) {
+			session.removeEventHandler(sessionEventHandler);
+			MNVShopProvider vsp = MNDirect.getVShopProvider();
+			vsp.removeEventHandler(vsEventHandler);
+		}
+	}
+	
+	private static void installHandlers() {
+		removeHandlers();
+		final MNSession session = MNDirect.getSession();
+		if (session != null) {
+			session.addEventHandler(sessionEventHandler);
+			if (isVShopEventAutoHandleEnabled) {
+				MNVShopProvider vsp = MNDirect.getVShopProvider();
+				vsp.addEventHandler(vsEventHandler);
+			}
+		}
+	}
 	
 	/**
 	 * @param v
@@ -259,8 +301,7 @@ public class MNDirectButton  {
 			final MNSession session = MNDirect.getSession();
 			
 			if (btn != null) {
-				session.removeEventHandler(sessionEventHandler);
-				session.addEventHandler(sessionEventHandler);
+				installHandlers();
 			}
 			final View bindView = activity.getWindow().peekDecorView();
 			
@@ -311,6 +352,7 @@ public class MNDirectButton  {
 	public static boolean isHidden () {
 		return (!isVisible ());
 	}
+	
 	
 	private static int defaultLocation = MNDirectButton.MNDIRECTBUTTON_TOPRIGHT;
 	private static boolean isInited  = false;

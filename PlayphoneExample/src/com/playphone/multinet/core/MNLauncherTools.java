@@ -52,9 +52,73 @@ class MNLauncherTools
     return ok;
    }
 
-  static String getLaunchParam (Intent intent)
+  static String getLaunchParam (Intent intent, int gameId)
    {
-    return intent.getStringExtra(LAUNCH_PARAM_INTENT_EXTRA_NAME);
+    if (isLaunchUrlScheme(intent.getScheme(),gameId))
+     {
+      // it is safe to assume that intent.getData() != null since
+      // scheme check passed
+
+      String param = intent.getDataString();
+
+      int pos = param.indexOf(':');
+
+      if (pos < 0)
+       {
+        return null;
+       }
+
+      param = param.substring(pos + 1);
+
+      for (pos = 0;
+           pos < 2 && param.length() > 0 && param.charAt(pos) == '/';
+           pos++)
+       {
+       }
+
+      if (pos > 0)
+       {
+        param = param.substring(pos);
+       }
+
+      return param;
+     }
+    else
+     {
+      return intent.getStringExtra(LAUNCH_PARAM_INTENT_EXTRA_NAME);
+     }
+   }
+
+  private static boolean isLaunchUrlScheme (String scheme, int gameId)
+   {
+    if (scheme == null)
+     {
+      return false;
+     }
+
+    String launchScheme = buildLaunchUrlScheme(gameId);
+
+    int testedSchemeLength = scheme.length();
+    int launchSchemeLength = launchScheme.length();
+
+    if      (testedSchemeLength < launchSchemeLength)
+     {
+      return false;
+     }
+    else if (testedSchemeLength == launchSchemeLength)
+     {
+      return scheme.equals(launchScheme);
+     }
+    else
+     {
+      return scheme.startsWith(launchScheme) &&
+             scheme.charAt(launchSchemeLength) == '-';
+     }
+   }
+
+  private static String buildLaunchUrlScheme (int gameId)
+   {
+    return "com-" + INSTANCE_ID + "-game-" + Integer.toString(gameId);
    }
 
   private static final String INSTANCE_ID                    = "playphone";

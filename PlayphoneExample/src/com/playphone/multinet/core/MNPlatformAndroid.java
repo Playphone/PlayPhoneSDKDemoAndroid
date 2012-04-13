@@ -32,6 +32,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.util.Log;
 
@@ -57,32 +59,98 @@ public class MNPlatformAndroid implements IMNPlatform
     return DEVICE_TYPE_CODE;
    }
 
-  public String getUniqueDeviceIdentifier ()
+  public String getDeviceProperty (int property)
+   {
+    if      (property == IMNPlatform.PROPERTY_UDID)
+     {
+      return getAndroidId();
+     }
+    else if (property == IMNPlatform.PROPERTY_PHONE_DEVICE_ID ||
+             property == IMNPlatform.PROPERTY_PHONE_SUBSCRIBER_ID ||
+             property == IMNPlatform.PROPERTY_PHONE_NUMBER)
+     {
+      return getTelephonyServiceProperty(property);
+     }
+
+    return null;
+   }
+
+  private String getAndroidId ()
    {
     String id = Secure.getString(activity.getContentResolver(),Secure.ANDROID_ID);
 
     return id != null ? id : EMULATOR_UNIQUE_DEVICE_ID;
    }
 
-  public String getUniqueDeviceIdentifier2 ()
+  private String getTelephonyServiceProperty (int property)
    {
-    String phoneId = null;
+    String value = null;
 
     if (activity.checkCallingOrSelfPermission
          (Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED)
      {
       try
        {
-        phoneId = ((TelephonyManager)activity.getSystemService
-                    (Context.TELEPHONY_SERVICE)).getDeviceId();
+        TelephonyManager tm = (TelephonyManager)activity.
+                                getSystemService(Context.TELEPHONY_SERVICE);
+
+        if (tm != null)
+         {
+          if      (property == IMNPlatform.PROPERTY_PHONE_DEVICE_ID)
+           {
+            value = tm.getDeviceId();
+           }
+          else if (property == IMNPlatform.PROPERTY_PHONE_SUBSCRIBER_ID)
+           {
+            value = tm.getSubscriberId();
+           }
+          else if (property == IMNPlatform.PROPERTY_PHONE_NUMBER)
+           {
+            value = tm.getLine1Number();
+           }
+         }
        }
       catch (Exception e)
        {
-        phoneId = null;
+        value = null;
        }
      }
 
-    return phoneId;
+    return value;
+   }
+
+  public String getWiFiMACAddress ()
+   {
+    if (activity.checkCallingOrSelfPermission
+         (Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED)
+     {
+      Log.d("MNPlatformAndroid","ACCESS_WIFI_STATE permission is not granted");
+
+      return null;
+     }
+
+    try
+     {
+      WifiManager wifiManager = (WifiManager)activity.getSystemService(Context.WIFI_SERVICE);
+
+      if (wifiManager == null)
+       {
+        return null;
+       }
+
+      WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+      if (wifiInfo == null)
+       {
+        return null;
+       }
+
+      return wifiInfo.getMacAddress();
+     }
+    catch (Exception e)
+     {
+      return null;
+     }
    }
 
   private static String replaceBarWithSpace (String s)
@@ -235,6 +303,11 @@ public class MNPlatformAndroid implements IMNPlatform
   public File         getMultiNetRootDir()
    {
     return new File(activity.getFilesDir(),MULTINET_ROOT_PATH);
+   }
+
+  public static File  getMultiNetRootDir(Context context)
+   {
+    return new File(context.getFilesDir(),MULTINET_ROOT_PATH);
    }
 
   public MNUserProfileView createUserProfileView ()

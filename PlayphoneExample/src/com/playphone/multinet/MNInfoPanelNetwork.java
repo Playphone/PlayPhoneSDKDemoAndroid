@@ -36,24 +36,25 @@ import android.widget.Toast;
 
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 
-public class MNInfoPanelNetwork {
+class MNInfoPanelNetwork {
 	
 	protected static final int WAIT_DELAY_AVATAR_LOAD = 10 * 1000;
 	protected static final int PANEL_SHOW_TIME_IN_MILS = 4 * 1000;
 	
-	protected static WeakReference<View> binderViewRef = new WeakReference<View>(null);
-	protected static Bitmap ourAvatarBitmap = null;
-	protected static Long ourId = MNConst.MN_USER_ID_UNDEFINED;
-	protected static Object loadAvatarLock = new Object();
-	protected static final Object animationShowLock = new Object();
-	protected static Boolean isAnimationShow = false;
-	protected static boolean isAnimationState = false;	
+	protected Helper helper = new Helper(); 
+	protected WeakReference<View> binderViewRef = new WeakReference<View>(null);
+	protected Bitmap ourAvatarBitmap = null;
+	protected Long ourId = MNConst.MN_USER_ID_UNDEFINED;
+	protected Object loadAvatarLock = new Object();
+	protected final Object animationShowLock = new Object();
+	protected Boolean isAnimationShow = false;
+	protected boolean isAnimationState = false;	
 	
-	protected static void setOurAvatarBitmap(Bitmap avatarBitmap) {
+	protected void setOurAvatarBitmap(Bitmap avatarBitmap) {
 		ourAvatarBitmap = avatarBitmap;
 	}
 
-	private static class ImageDownloader extends MNURLDownloader implements
+	private class ImageDownloader extends MNURLDownloader implements
 			MNURLDownloader.IErrorEventHandler {
 		public ConditionVariable lock = new ConditionVariable(); 
 		
@@ -74,21 +75,21 @@ public class MNInfoPanelNetwork {
 		}
 	}
 	
-	protected static void animate() {
+	protected void animate() {
 		new Thread(new Runnable() {
-			final View panel    = Helper.panelView;
+			final View panel    = helper.panelView;
 			final View hostView = binderViewRef.get();
 			
 			private void fillPanel(String message) {
 				try {
 					TextView welcome = (TextView) panel
-					.findViewById(Helper.welcomeId);
+					.findViewById(helper.welcomeId);
 					
 					welcome.setText(message);
 					
 					if (ourAvatarBitmap != null) {
 						ImageView avatar = (ImageView) panel
-								.findViewById(Helper.avatarId);
+								.findViewById(helper.avatarId);
 						avatar.setImageBitmap(ourAvatarBitmap);
 					}
 				} catch (Exception e) {
@@ -130,10 +131,10 @@ public class MNInfoPanelNetwork {
 				isAnimationState = true;
 
 				if ((session != null) && (session.getMyUserName() != null)) {
-					welcomeMsg = Helper.welcomeTemplate.replace("{0}",
+					welcomeMsg = helper.welcomeTemplate.replace("{0}",
 							session.getMyUserName());
 				} else {
-					welcomeMsg = Helper.welcomeTemplate.replace("{0}",".");
+					welcomeMsg = helper.welcomeTemplate.replace("{0}",".");
 				}
 
 				if ((ourAvatarBitmap == null)
@@ -176,17 +177,17 @@ public class MNInfoPanelNetwork {
 		}).start();
 	}
 
-	static class Helper {
-		private static Context context = null;
-		private static View panelView = null;
-		private static TextView welcomeLabel = null;
-		private static String welcomeTemplate = null;
-//		private static ImageView avatar = null;
-		private static int welcomeId;
-		private static int avatarId;
+	class Helper {
+		private Context context = null;
+		private View panelView = null;
+		private TextView welcomeLabel = null;
+		private String welcomeTemplate = null;
+//		private ImageView avatar = null;
+		private int welcomeId;
+		private int avatarId;
 		
 
-		public static View getNetworkPanel() {
+		public View getNetworkPanel() {
 			if (context == null) {
 				return null;
 			}
@@ -214,7 +215,7 @@ public class MNInfoPanelNetwork {
 			return panelView;
 		}
 
-		public synchronized static void bindTo(ViewGroup vg) {
+		public synchronized void bindTo(ViewGroup vg) {
 			if (panelView != null) {
 				ViewGroup parentVG = (ViewGroup) (panelView.getParent());
 
@@ -232,8 +233,8 @@ public class MNInfoPanelNetwork {
 			vg.addView(getNetworkPanel());
 		}
 
-		public static void setContext(Context context) {
-			Helper.context = context;
+		public void setContext(Context context) {
+			helper.context = context;
 			if (context == null){
                 panelView = null;
                 welcomeLabel = null;
@@ -241,8 +242,8 @@ public class MNInfoPanelNetwork {
 		}
 	}
 	
-	private static class EventHandler extends MNSessionEventHandlerAbstract {
-		protected static long oldUserId = MNConst.MN_USER_ID_UNDEFINED;
+	private class EventHandler extends MNSessionEventHandlerAbstract {
+		protected long oldUserId = MNConst.MN_USER_ID_UNDEFINED;
 		@Override
 		public void mnSessionUserChanged(long userId) {
 			if ((userId != oldUserId) && 
@@ -253,27 +254,27 @@ public class MNInfoPanelNetwork {
 		}
 	}
 
-	protected static void install() {
+	protected void install() {
 		binderViewRef.get().post(new Runnable() {
 			@Override
 			public void run() {
 				ViewGroup vg = (ViewGroup) binderViewRef.get();
 				if (vg != null) {
-					Helper.bindTo(vg);
+					helper.bindTo(vg);
 					vg = null;
 				}
 			}
 		});
 	}
 	
-	private static IMNSessionEventHandler sessionHandler = null;
+	private IMNSessionEventHandler sessionHandler = null;
 	
-	public static void bind(View v) {
+	public void bind(View v) {
 		MNSession session = MNDirect.getSession();
 		
 		if (session == null) {
 			Log.w("MNInfoPanelNetwork","unexpected MNSession is null");
-			Helper.setContext(null);
+			helper.setContext(null);
 			return;
 		}
 		
@@ -289,10 +290,10 @@ public class MNInfoPanelNetwork {
 		
 		if (v == null) {
 			isAnimationShow = false;
-			Helper.setContext(null);
+			helper.setContext(null);
 			session.removeEventHandler(sessionHandler);
 		} else {
-			Helper.setContext(v.getContext());
+			helper.setContext(v.getContext());
 			install();
 			session.addEventHandler(sessionHandler);
 			sessionHandler = null;
@@ -302,7 +303,7 @@ public class MNInfoPanelNetwork {
 		}
 	}
 
-	public static void bind(Activity activity) {
+	public void bind(Activity activity) {
 		if (activity == null) {
 			bind((View)null);
 		} else {
@@ -317,9 +318,9 @@ public class MNInfoPanelNetwork {
 		}
 	}
 	
-	private static IEventHandler eventHandler = null; 
+	private IEventHandler eventHandler = null; 
 	
-	public static IEventHandler getDirectUIEventHandler() {
+	public IEventHandler getDirectUIEventHandler() {
 		if (eventHandler != null) {
 			return eventHandler;
 		}
@@ -337,7 +338,7 @@ public class MNInfoPanelNetwork {
 	}
 	
     // Popup by toast notification
-	private static void loadAvatar(final MNUserInfo currUserInfo) {
+	private void loadAvatar(final MNUserInfo currUserInfo) {
 		
 		final String currAvatarUrl = currUserInfo.getAvatarUrl();
 		if (currAvatarUrl == null) {
@@ -357,22 +358,22 @@ public class MNInfoPanelNetwork {
 		}
 	}
 	
-	private static void fillNotificationView(final View v, final MNUserInfo userInfo) {
+	private void fillNotificationView(final View v, final MNUserInfo userInfo) {
 		String userName = userInfo.userName;
 		if (userName == null) {
 			userName = "";
 		}
 		try {
-		final String welcomeMsg = Helper.welcomeTemplate.replace("{0}",
+		final String welcomeMsg = helper.welcomeTemplate.replace("{0}",
 				userName);
 
-			TextView welcome = (TextView) v.findViewById(Helper.welcomeId);
+			TextView welcome = (TextView) v.findViewById(helper.welcomeId);
 			
 			welcome.setText(welcomeMsg);
 			
 			if (ourAvatarBitmap != null) {
 				ImageView avatar = (ImageView) v
-						.findViewById(Helper.avatarId);
+						.findViewById(helper.avatarId);
 				avatar.setImageBitmap(ourAvatarBitmap);
 			}
 		} catch (Exception e) {
@@ -380,17 +381,17 @@ public class MNInfoPanelNetwork {
 		}
 	}
 	
-	private static void showNotification(final MNUserInfo userInfo) {
+	private void showNotification(final MNUserInfo userInfo) {
 		try {
-			Resources res = Helper.context.getApplicationContext().getResources();
-			int panelId = res.getIdentifier("mninfopanelnetwork","layout", Helper.context.getPackageName());
-	        LayoutInflater li = (LayoutInflater) Helper.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			Resources res = helper.context.getApplicationContext().getResources();
+			int panelId = res.getIdentifier("mninfopanelnetwork","layout", helper.context.getPackageName());
+	        LayoutInflater li = (LayoutInflater) helper.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			// View tv = Helper.getNetworkPanel();
 	        View tv = li.inflate(panelId, null);
 
 			fillNotificationView(tv, userInfo);
 
-			Toast t = Toast.makeText(Helper.context, "Network notification",
+			Toast t = Toast.makeText(helper.context, "Network notification",
 					Toast.LENGTH_LONG);
 			t.setView(tv);
 			t.setGravity(Gravity.TOP, 0, 0);
@@ -401,7 +402,7 @@ public class MNInfoPanelNetwork {
 		}
 	}
 	
-	private static void showToast() {
+	private void showToast() {
 		try {
 			MNSession session = MNDirect.getSession();
 			if (session == null) {
@@ -426,9 +427,9 @@ public class MNInfoPanelNetwork {
 		}
 	}
 	
-	private static class ToastEventHandler extends
+	private class ToastEventHandler extends
 			MNSessionEventHandlerAbstract {
-		protected static long oldUserId = MNConst.MN_USER_ID_UNDEFINED;
+		protected long oldUserId = MNConst.MN_USER_ID_UNDEFINED;
 		@Override
 		public void mnSessionUserChanged(long userId) {
 			if ((userId != oldUserId) && 

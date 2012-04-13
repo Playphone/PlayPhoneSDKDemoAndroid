@@ -24,22 +24,21 @@ import com.playphone.multinet.MNDirectUIHelper.IEventHandler;
 import com.playphone.multinet.core.MNSession;
 import com.playphone.multinet.providers.MNMyHiScoresProvider;
 
-public class MNInfoPanelHighScore {
-	protected static WeakReference<View> binderViewRef = new WeakReference<View>(null);
+class MNInfoPanelHighScore {
+	protected WeakReference<View> binderViewRef = new WeakReference<View>(null);
+	private Helper helper = new Helper();
+	protected boolean isAnimationState = false;
 	
-	protected static boolean isAnimationState = false;
-	
-	
-	static Thread animThread() {
+	private Thread animThread() {
 		return new Thread(new Runnable() {
 			@Override
 			public void run() {
-				if (Helper.panelView != null) {
+				if (helper.panelView != null) {
 					if (binderViewRef.get() != null) {
 						binderViewRef.get().post(new Runnable() {
 							@Override
 							public void run() {
-								Helper.panelView.setVisibility(View.VISIBLE);
+								helper.panelView.setVisibility(View.VISIBLE);
 							}
 						});
 					}
@@ -50,12 +49,12 @@ public class MNInfoPanelHighScore {
 				} catch (InterruptedException e) {
 				}
 				isAnimationState = false;
-				if (Helper.panelView != null) {
+				if (helper.panelView != null) {
 					if (binderViewRef.get() != null) {
 						binderViewRef.get().post(new Runnable() {
 							@Override
 							public void run() {
-								Helper.panelView.setVisibility(View.GONE);
+								helper.panelView.setVisibility(View.GONE);
 							}
 						});
 					}
@@ -64,11 +63,11 @@ public class MNInfoPanelHighScore {
 		});
 	}
 	
-	static class  Helper {
-		private static Context context = null;
-		private static View panelView = null;
+	class  Helper {
+		private Context context = null;
+		private View panelView = null;
 		
-		public synchronized static View getMyHiScorePanel () {
+		public synchronized View getMyHiScorePanel () {
 			if (context == null) {
 				return null;
 			}
@@ -85,7 +84,7 @@ public class MNInfoPanelHighScore {
 			return panelView;
 		}
 
-		private synchronized static void bindTo(ViewGroup vg) {
+		private synchronized void bindTo(ViewGroup vg) {
 			if (panelView != null) {
 				ViewGroup parentVG = (ViewGroup) (panelView.getParent());
 
@@ -103,26 +102,26 @@ public class MNInfoPanelHighScore {
 			vg.addView(getMyHiScorePanel());
 		}
 
-		public static void setContext(Context context) {
-			Helper.context = context;
+		public void setContext(Context context) {
+			helper.context = context;
 			if (context == null){
                 panelView = null;
             }
 		}
 	}
 	
-	protected static void animate() {
+	protected void animate() {
 		animThread().start();
 	}
 	
-	protected static MNMyHiScoresProvider.IEventHandler hiScoreEvent = new MNMyHiScoresProvider.IEventHandler() {
+	protected MNMyHiScoresProvider.IEventHandler hiScoreEvent = new MNMyHiScoresProvider.IEventHandler() {
 		@Override
 		public void onNewHiScore(long newScore, int gameSetId, int periodMask) {
 			animate();
 		}
 	};
 	
-	protected static void install() {
+	protected void install() {
 		MNMyHiScoresProvider.IEventHandler hsEventHandler;
 		MNMyHiScoresProvider hiScoreProvider = MNDirect.getMyHiScoresProvider();
 		
@@ -140,32 +139,32 @@ public class MNInfoPanelHighScore {
 			public void run() {
 				ViewGroup vg = (ViewGroup) binderViewRef.get();
 				if (vg != null) {
-					Helper.bindTo(vg);
+					helper.bindTo(vg);
 					vg = null;
 				}
 			}
 		});
 	}
 	
-	public static void bind(View v) {
+	public void bind(View v) {
 		MNSession session = MNDirect.getSession();
 		
 		if (session == null) {
 			Log.w("MNInfoPanelHighScore","unexpected MNSession is null");
-			Helper.setContext(null);
+			helper.setContext(null);
 			return;
 		}
 		
 		binderViewRef = new WeakReference<View>(v);
 		if (v == null) {
-			Helper.setContext(null);
+			helper.setContext(null);
 		} else {
-			Helper.setContext(v.getContext());
+			helper.setContext(v.getContext());
 			install();
 		}
 	}
 
-	public static void bind(Activity activity) {
+	public void bind(Activity activity) {
 		if (activity == null) {
 			bind((View)null);
 		} else {
@@ -181,9 +180,9 @@ public class MNInfoPanelHighScore {
 		}
 	}
 	
-	private static IEventHandler eventHandler = null; 
+	private IEventHandler eventHandler = null; 
 	
-	public static IEventHandler getDirectUIEventHandler () {
+	public IEventHandler getDirectUIEventHandler () {
 		if (eventHandler == null) {
 			eventHandler = new IEventHandler() {
 				@Override
@@ -199,17 +198,15 @@ public class MNInfoPanelHighScore {
 		return eventHandler; 
 	}
 	
-	
-	
-	private static void showNotification() {
+	private void showNotification() {
 		try {
-			Resources res = Helper.context.getApplicationContext().getResources();
-			int panelId = res.getIdentifier("mninfopanelhighscore","layout", Helper.context.getPackageName());
-	        LayoutInflater li = (LayoutInflater) Helper.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			Resources res = helper.context.getApplicationContext().getResources();
+			int panelId = res.getIdentifier("mninfopanelhighscore","layout", helper.context.getPackageName());
+	        LayoutInflater li = (LayoutInflater) helper.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	        
 	        View tv = li.inflate(panelId, null);
 
-			Toast t = Toast.makeText(Helper.context, "High score notification",
+			Toast t = Toast.makeText(helper.context, "High score notification",
 					Toast.LENGTH_SHORT);
 			t.setView(tv);
 			t.setGravity(Gravity.TOP, 0, 0);
@@ -220,7 +217,7 @@ public class MNInfoPanelHighScore {
 		}
 	}
 	
-	private static void showToast() {
+	private void showToast() {
 		try {
 			binderViewRef.get().post(new Runnable() {
 				@Override
@@ -233,7 +230,7 @@ public class MNInfoPanelHighScore {
 		}
 	}
 	
-	protected static MNMyHiScoresProvider.IEventHandler hiToastScoreEvent = new MNMyHiScoresProvider.IEventHandler() {
+	protected MNMyHiScoresProvider.IEventHandler hiToastScoreEvent = new MNMyHiScoresProvider.IEventHandler() {
 		@Override
 		public void onNewHiScore(long newScore, int gameSetId, int periodMask) {
 			showToast();

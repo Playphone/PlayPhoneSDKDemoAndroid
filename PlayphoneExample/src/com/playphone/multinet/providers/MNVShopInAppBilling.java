@@ -182,6 +182,8 @@ class MNVShopInAppBilling implements MNInAppBilling.IEventHandler
   public synchronized void onServiceBecomeUnavailable ()
    {
     serviceStarted = false;
+
+    Log.i(TAG,"in-app billing is become unavailable");
    }
 
   private synchronized boolean isServiceStarted ()
@@ -206,13 +208,17 @@ class MNVShopInAppBilling implements MNInAppBilling.IEventHandler
      }
     catch (RemoteException e)
      {
-      syncResponse = null;
+      Log.w(TAG,"sending 'get purchase information' request failed with exception " +
+                e.toString());
      }
 
-    if (!syncResponse.requestSucceeded())
+    if (syncResponse != null)
      {
-      Log.w(TAG,"sending 'get purchase information' request failed with status " +
-                 Integer.toString(syncResponse.getResponseCode()));
+      if (!syncResponse.requestSucceeded())
+       {
+        Log.w(TAG,"sending 'get purchase information' request failed with status " +
+                   Integer.toString(syncResponse.getResponseCode()));
+       }
      }
    }
 

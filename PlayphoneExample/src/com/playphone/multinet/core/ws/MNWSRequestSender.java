@@ -106,7 +106,7 @@ public class MNWSRequestSender
     postBodyBuilder.addParam("ctx_gameset_id",Integer.toString(session.getDefaultGameSetId()));
     postBodyBuilder.addParam("ctx_dev_type",Integer.toString(session.getPlatform().getDeviceType()));
     postBodyBuilder.addParam("ctx_dev_id",MNUtils.stringGetMD5String
-                                           (session.getPlatform().getUniqueDeviceIdentifier()));
+                                           (session.getUniqueAppId()));
 
     if (authorized)
      {

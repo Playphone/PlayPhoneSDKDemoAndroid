@@ -99,7 +99,7 @@ public class MNWSInfoRequestLeaderboard extends MNWSInfoRequest
     private final int  period;
    }
 
-  private abstract static class LeaderboardMode
+  public abstract static class LeaderboardMode
    {
     protected abstract String addContent (MNWSRequestContent content);
    }

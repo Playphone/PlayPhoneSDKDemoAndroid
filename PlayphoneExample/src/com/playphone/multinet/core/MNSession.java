@@ -38,7 +38,8 @@ import com.playphone.multinet.MNErrorInfo;
 public class MNSession implements MNSmartFoxFacade.IEventHandler,
                                   ISFSEventListener,
                                   MNSocNetSessionFB.IEventHandler,
-                                  MNOfflinePack.IEventHandler
+                                  MNOfflinePack.IEventHandler,
+                                  MNTrackingSystem.IEventHandler
  {
   /**
    * Constructs a new MNSession object.
@@ -75,10 +76,11 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     roomExtraInfoReceived = false;
     fastResumeEnabled     = true;
     webShopIsReady        = false;
+    useInstallIdInsteadOfUDID = false;
 
     appExtParams = platform.readAppExtParams();
 
-    smartFoxFacade = new MNSmartFoxFacade(platform,buildConfigRequestUrl());
+    smartFoxFacade = new MNSmartFoxFacade(this,buildConfigRequestUrl());
 
     smartFoxFacade.setEventHandler(this);
 
@@ -101,7 +103,8 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     launchParam  = null;
 
     launchTime = System.currentTimeMillis() / 1000;
-    launchId   = makeLaunchId(platform);
+    launchId   = MNUtils.generateUniqueId();
+    installId  = loadInstallId();
 
     trackingSystem = null;
     appConfigVars  = new HashMap<String,String>();
@@ -148,7 +151,23 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     return s.replace('|',' ');
    }
 
-  private String makeStructuredPasswordFromParams (String loginModel, String gameSecret, String passwordHash, boolean userDevSetHome)
+  private String loadInstallId ()
+   {
+    String installId = varStorage.getValue(INSTALL_ID_VAR_NAME);
+
+    if (installId == null)
+     {
+      installId = MNUtils.generateUniqueId();
+
+      varStorage.setValue(INSTALL_ID_VAR_NAME,installId);
+
+      varStorage.writeToFile(VAR_STORAGE_FILE_NAME);
+     }
+
+    return installId;
+   }
+
+  private MNSmartFoxFacade.StructuredPassword makeStructuredPasswordFromParams (String loginModel, String gameSecret, String passwordHash, boolean userDevSetHome)
    {
     String appVerInternal = platform.getAppVerInternal();
     String appVerExternal = platform.getAppVerExternal();
@@ -163,18 +182,17 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
       appVerExternal = "";
      }
 
-    return CLIENT_API_VERSION + "," +
-           loginModel + "," +
-           passwordHash + "," +
-           gameSecret + "," +
-           Integer.toString(platform.getDeviceType()) + "," +
-           MNUtils.stringGetMD5String
-            (platform.getUniqueDeviceIdentifier()) + "," +
-           (userDevSetHome ? "1" : "0") + "," +
-           replaceCommaWithDash(platform.getDeviceInfoString()) + "," +
-           replaceCommaWithDash(launchId + "|" +
-                                replaceBarWithSpace(appVerInternal) + "|" +
-                                replaceBarWithSpace(appVerExternal));
+    return new MNSmartFoxFacade.StructuredPassword
+                (CLIENT_API_VERSION + "," +
+                 loginModel + "," +
+                 passwordHash + "," +
+                 gameSecret + "," +
+                 Integer.toString(platform.getDeviceType()) + ",",
+                 "," + (userDevSetHome ? "1" : "0") + "," +
+                 replaceCommaWithDash(platform.getDeviceInfoString()) + "," +
+                 replaceCommaWithDash(launchId + "|" +
+                                      replaceBarWithSpace(appVerInternal) + "|" +
+                                      replaceBarWithSpace(appVerExternal)));
    }
 
   private String makeNewGuestPassword ()
@@ -182,26 +200,11 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     Random rng = new Random();
 
     return MNUtils.stringGetMD5String
-            (platform.getUniqueDeviceIdentifier() +
+            (MNUtils.randomBytesAsHexString(8) +
              Long.toString(System.currentTimeMillis()) +
              Long.toString(System.nanoTime()) +
              Integer.toString(rng.nextInt()) +
              Integer.toString(rng.nextInt()));
-   }
-
-  static private String makeLaunchId (IMNPlatform platform)
-   {
-    StringBuilder builder = new StringBuilder();
-
-    builder.append(platform.getUniqueDeviceIdentifier());
-    builder.append(':');
-    builder.append(Long.toString(System.currentTimeMillis() / 1000));
-    builder.append(':');
-    builder.append(Long.toString(System.nanoTime()));
-    builder.append(':');
-    builder.append(Integer.toString((new Random()).nextInt()));
-
-    return MNUtils.stringGetMD5String(builder.toString());
    }
 
   private void dispatchUserChangedEvent (long userId)
@@ -434,7 +437,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
      }
    }
 
-  private boolean loginWithUserLoginAndStructuredPassword (String login, String structuredPassword)
+  private boolean loginWithUserLoginAndStructuredPassword (String login, MNSmartFoxFacade.StructuredPassword structuredPassword)
    {
     if (status != MNConst.MN_OFFLINE)
      {
@@ -910,7 +913,20 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
    */
   public void sendAppBeacon (String actionName, String beaconData)
    {
-    getTrackingSystem().sendBeacon(actionName,beaconData,this);
+    getTrackingSystem().sendBeacon(actionName,beaconData,0,this);
+   }
+
+  /**
+   * Sends application custom "beacon".
+   * Beacons are used for application actions usage statistic.
+   *
+   * @param actionName name of the action
+   * @param beaconData "beacon" data
+   * @param beaconCallSeqNumber arbitrary value which will be passed to response handler
+   */
+  public void sendAppBeacon (String actionName, String beaconData, long beaconCallSeqNumber)
+   {
+    getTrackingSystem().sendBeacon(actionName,beaconData,beaconCallSeqNumber,this);
    }
 
   /**
@@ -1074,7 +1090,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
    */
   public void handleApplicationIntent (Intent intent)
    {
-    String param = MNLauncherTools.getLaunchParam(intent);
+    String param = MNLauncherTools.getLaunchParam(intent,gameId);
 
     if (param != null)
      {
@@ -1795,11 +1811,18 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
 
   public void onConfigLoaded ()
    {
+    useInstallIdInsteadOfUDID = smartFoxFacade.configData.useInstallIdInsteadOfUDID != 0;
+
     MNTrackingSystem trackingSystem = getTrackingSystem();
 
     if (smartFoxFacade.configData.launchTrackerUrl != null)
      {
       trackingSystem.trackLaunchWithUrlTemplate(smartFoxFacade.configData.launchTrackerUrl,this);
+     }
+
+    if (smartFoxFacade.configData.installTrackerUrl != null)
+     {
+      trackingSystem.trackInstallWithUrlTemplate(smartFoxFacade.configData.installTrackerUrl,this);
      }
 
     if (smartFoxFacade.configData.shutdownTrackerUrl != null)
@@ -1857,7 +1880,13 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
       eventHandlers.endCall();
      }
 
-    if (fastResumeEnabled && smartFoxFacade.configData.tryFastResumeMode != 0)
+    if (fastResumeEnabled && smartFoxFacade.configData.tryFastResumeMode == 2)
+     {
+      fastResumeEnabled = false;
+
+      loginAuto();
+     }
+    else if (fastResumeEnabled && smartFoxFacade.configData.tryFastResumeMode != 0)
      {
       fastResumeEnabled = false;
 
@@ -2847,6 +2876,25 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
      }
    }
 
+  public void socNetFBTokenStatusChanged (IMNSessionEventHandler.AuthTokenChangedEvent eventData)
+   {
+    eventHandlers.beginCall();
+
+    try
+     {
+      int count = eventHandlers.size();
+
+      for (int index = 0; index < count; index++)
+       {
+        eventHandlers.get(index).mnSessionSocNetTokenStatusChanged(MNSocNetSessionFB.SOCNET_ID,eventData);
+       }
+     }
+    finally
+     {
+      eventHandlers.endCall();
+     }
+   }
+
   public IMNPlatform getPlatform ()
    {
     return platform;
@@ -2930,14 +2978,50 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     return launchId;
    }
 
+  /*package*/ String getInstallId ()
+   {
+    return installId;
+   }
+
+  public String getUniqueAppId ()
+   {
+    if (useInstallIdInsteadOfUDID)
+     {
+      return installId;
+     }
+    else
+     {
+      return platform.getDeviceProperty(IMNPlatform.PROPERTY_UDID);
+     }
+   }
+
   /*package*/ synchronized MNTrackingSystem getTrackingSystem()
    {
     if (trackingSystem == null)
      {
-      trackingSystem = new MNTrackingSystem(this);
+      trackingSystem = new MNTrackingSystem(this,this);
      }
 
     return trackingSystem;
+   }
+
+  public void onAppBeaconResponseReceived (MNAppBeaconResponse response)
+   {
+    eventHandlers.beginCall();
+
+    try
+     {
+      int count = eventHandlers.size();
+
+      for (int index = 0; index < count; index++)
+       {
+        eventHandlers.get(index).mnSessionAppBeaconResponseReceived(response);
+       }
+     }
+    finally
+     {
+      eventHandlers.endCall();
+     }
    }
 
   /*package*/ Map<String,String> getAppConfigVars ()
@@ -3019,8 +3103,10 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
 
   private long             launchTime;
   private String           launchId;
+  private String           installId;
 
   private boolean          webShopIsReady;
+  private boolean          useInstallIdInsteadOfUDID;
 
   private MNTrackingSystem trackingSystem;
   private HashMap<String,String> appConfigVars;
@@ -3034,7 +3120,8 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
   public static final int MN_CREDENTIALS_WIPE_ALL  = 2;
 
   public static final String VAR_STORAGE_FILE_NAME = "mn_vars.dat";
-  public static final String INSTALL_REFERRER_VAR_NAME = "app.install.referrer.params";
+  public static final String INSTALL_REFERRER_VAR_NAME = MNInstallReferrerReceiver.INSTALL_REFERRER_DATA_VAR_NAME;
+  private static final String INSTALL_ID_VAR_NAME = "app.install.id";
 
   public static final String PERSISTENT_VAR_USER_ALL_USERS_MASK = "user.*";
   public static final String PERSISTENT_VAR_USER_SINGLE_USER_MASK_FORMAT = "user.%d.*";
@@ -3043,7 +3130,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
   private static final String APP_PROPERTY_VAR_PATH_PREFIX = "prop.";
   private static final int APP_COMMAND_SET_APP_PROPERTY_PREFIX_LEN = APP_COMMAND_SET_APP_PROPERTY_PREFIX.length();
 
-  public static final String CLIENT_API_VERSION = "1_4_9";
+  public static final String CLIENT_API_VERSION = "2_0_1";
 
   private static final String GAME_ZONE_NAME_PREFIX = "Game_";
   private static final String SMARTFOX_EXT_NAME = "MultiNetExtension";

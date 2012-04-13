@@ -22,6 +22,9 @@ import android.util.Log;
 
 public class MNInstallReferrerReceiver extends BroadcastReceiver
  {
+  public static final String INSTALL_REFERRER_DATA_VAR_NAME      = "app.install.referrer.params";
+  public static final String INSTALL_REFERRER_PARSED_AT_VAR_NAME = "app.install.referrer.params_parsed_at";
+
   @Override
   public void onReceive (Context context, Intent intent)
    {
@@ -33,7 +36,7 @@ public class MNInstallReferrerReceiver extends BroadcastReceiver
        {
         final MNVarStorage storage = getVarStorage(context);
 
-        storage.setValue(MNSession.INSTALL_REFERRER_VAR_NAME,referrer);
+        storage.setValue(INSTALL_REFERRER_DATA_VAR_NAME,referrer);
         storage.writeToFile(MNSession.VAR_STORAGE_FILE_NAME);
        }
       catch (Exception e)

@@ -13,13 +13,16 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.RelativeLayout;
 
 import com.playphone.multinet.core.IMNUserProfileViewEventHandler;
 import com.playphone.multinet.core.MNEventHandlerArray;
@@ -28,50 +31,26 @@ import com.playphone.multinet.core.MNSessionEventHandlerAbstract;
 import com.playphone.multinet.core.MNUserProfileView;
 
 public class MNDirectUIHelper {
-	// dashboard create flags
-	protected static boolean edgePopupDashboardFlag  = true;
-	protected static boolean fullScreenDashboardFlag = false; 
-	
-	protected static boolean showOnBind = false;
-	
-	/**
-	 * This is default 
-	 * Call before show Dashboard
-	 */
-	protected static void setDashboardNewStyle() {
-		edgePopupDashboardFlag  = true; 
-		fullScreenDashboardFlag = false; 
-	}
-	/**
-	 * Call before show Dashboard
-	 */
-	protected static void setDashboardOldStyle() {
-		edgePopupDashboardFlag  = false; 
-		fullScreenDashboardFlag = true; 
-	}
-	
 	public static final int DASHBOARD_STYLE_FULLSCREEN = 1;
 	public static final int DASHBOARD_STYLE_POPUP      = 2;
+	public static final int DASHBOARD_STYLE_POPUP_MINI = 3; // 300x220 dpx
+	
+	protected static boolean showOnBind = false;
+	protected static int dashboardStyle = DASHBOARD_STYLE_POPUP; // default style   
+	
 
 	public static void setDashboardStyle(int newStyle) {
-		if (newStyle == DASHBOARD_STYLE_POPUP)
-		{
-			setDashboardNewStyle();
-		}
-		else
-		{
-			setDashboardOldStyle();
-		}
-	}
-	
-	public static int getDashboardStyle() {
-		if (fullScreenDashboardFlag)
-		{
-			return(DASHBOARD_STYLE_FULLSCREEN);
-		}
-		else
-		{
-			return(DASHBOARD_STYLE_POPUP);
+		switch (newStyle) {
+		case DASHBOARD_STYLE_FULLSCREEN :
+			dashboardStyle = DASHBOARD_STYLE_FULLSCREEN; 
+			break;
+		case DASHBOARD_STYLE_POPUP_MINI :
+			dashboardStyle = DASHBOARD_STYLE_POPUP_MINI;
+			break;
+		case DASHBOARD_STYLE_POPUP :
+		default :
+			dashboardStyle = DASHBOARD_STYLE_POPUP;
+			break;
 		}
 	}
 	
@@ -307,17 +286,104 @@ public class MNDirectUIHelper {
 
 		protected int getMNDashboardTheme() {
 			int resultThemeId = android.R.style.Theme_Dialog;
-			if (edgePopupDashboardFlag) {
-				resultThemeId = getContext().getResources().getIdentifier(
-						"Theme_Dashboard", "style",
-						getContext().getPackageName());
-			} else {
+			switch (dashboardStyle) {
+			case DASHBOARD_STYLE_FULLSCREEN :	
 				resultThemeId = getContext().getResources().getIdentifier(
 						"Theme_Dashboard_Fullscreen", "style",
 						getContext().getPackageName());
+				break;
+			case DASHBOARD_STYLE_POPUP :
+			case DASHBOARD_STYLE_POPUP_MINI :	
+			default:
+				resultThemeId = getContext().getResources().getIdentifier(
+						"Theme_Dashboard", "style",
+						getContext().getPackageName());
+				break;
+
 			}
 
 			return resultThemeId;
+		}
+		
+		static final int POPUP_PADDING = 5; 
+		static final int POPUP_MARGIN = 5;
+		
+		private View getDashboardView (View contentView) {
+			final Resources res = getContext().getResources();
+			final String packageName = getContext().getPackageName();
+			final LayoutInflater li = (LayoutInflater)getContext().getSystemService
+		      (Context.LAYOUT_INFLATER_SERVICE);
+			final int resultDashboardId = res.getIdentifier("mndashboard", "layout", packageName);
+			View mnDashboard = null;
+			mnDashboard = li.inflate(resultDashboardId, null);
+			int bgFrameId =  res.getIdentifier("mnwfview_bg", "id", packageName);
+			int viewFrameId =  res.getIdentifier("mnwfview", "id", packageName);
+			RelativeLayout bgFrame = (RelativeLayout) mnDashboard.findViewById(bgFrameId);
+			RelativeLayout viewFrame = (RelativeLayout) mnDashboard.findViewById(viewFrameId);
+			
+			switch (dashboardStyle) {
+			case DASHBOARD_STYLE_FULLSCREEN :
+				bgFrame.setVisibility(View.GONE);
+				RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.FILL_PARENT, RelativeLayout.LayoutParams.FILL_PARENT);
+				viewFrame.setLayoutParams(lp);
+				break;
+			case DASHBOARD_STYLE_POPUP_MINI : {
+				int widthBG = (int) (res.getDisplayMetrics().density * 310 + 0.5);
+				int heightBG = (int) (res.getDisplayMetrics().density * 230 + 0.5);
+				int width = (int) (res.getDisplayMetrics().density * 300 + 0.5);
+				int height = (int) (res.getDisplayMetrics().density * 220 + 0.5);
+				RelativeLayout.LayoutParams bgLP = new RelativeLayout.LayoutParams(
+						widthBG, heightBG);
+				bgLP.addRule(RelativeLayout.CENTER_IN_PARENT,
+						RelativeLayout.TRUE);
+				bgFrame.setLayoutParams(bgLP);
+
+				RelativeLayout.LayoutParams viewLP = new RelativeLayout.LayoutParams(
+						width, height);
+				viewLP.addRule(RelativeLayout.CENTER_IN_PARENT,
+						RelativeLayout.TRUE);
+				viewFrame.setLayoutParams(viewLP);
+			}
+				break;
+			case DASHBOARD_STYLE_POPUP: {
+				int padding = (int) (res.getDisplayMetrics().density
+						* POPUP_PADDING + 0.5);
+				mnDashboard.setPadding(padding, padding, padding, padding);
+				RelativeLayout.LayoutParams bgLP = new RelativeLayout.LayoutParams(
+						RelativeLayout.LayoutParams.FILL_PARENT,
+						RelativeLayout.LayoutParams.FILL_PARENT);
+				bgLP.addRule(RelativeLayout.CENTER_IN_PARENT,
+						RelativeLayout.TRUE);
+				bgFrame.setLayoutParams(bgLP);
+
+				RelativeLayout.LayoutParams vlp = new RelativeLayout.LayoutParams(
+						RelativeLayout.LayoutParams.FILL_PARENT,
+						RelativeLayout.LayoutParams.FILL_PARENT);
+				vlp.addRule(RelativeLayout.CENTER_IN_PARENT,
+						RelativeLayout.TRUE);
+				int margin = (int) (res.getDisplayMetrics().density
+						* POPUP_MARGIN + 0.5);
+				vlp.setMargins(margin, margin, margin, margin);
+				viewFrame.setLayoutParams(vlp);
+				
+			}
+				break;
+			}
+			
+			// install content view into view frame
+			ViewGroup parentView = (ViewGroup) (contentView.getParent());
+
+			if (parentView != null) {
+				parentView.removeView(contentView);
+			}
+			
+			RelativeLayout.LayoutParams clp = new RelativeLayout.LayoutParams(
+					RelativeLayout.LayoutParams.FILL_PARENT,
+					RelativeLayout.LayoutParams.FILL_PARENT);
+			contentView.setLayoutParams(clp);
+			viewFrame.addView(contentView);
+			
+			return mnDashboard;
 		}
 
 		@Override
@@ -326,18 +392,10 @@ public class MNDirectUIHelper {
 			getContext().setTheme(getMNDashboardTheme ());
 			final Window w = getWindow();
 			w.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-
-			View contentView = MNDirect.getView();
-
-			ViewGroup parentView = (ViewGroup) (contentView.getParent());
-
-			if (parentView != null) {
-				parentView.removeView(contentView);
-			}
-
-			addContentView(contentView, getLayout(fullScreenDashboardFlag ? 0 : PADDING_SIZE));
-
 			w.setLayout(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.FILL_PARENT);
+			
+			View mnDashboard = getDashboardView (MNDirect.getView());
+			addContentView(mnDashboard, getLayout(0));
 
 			setOnKeyListener(new OnKeyListener() {
 				@Override

@@ -7,6 +7,8 @@
 
 package com.playphone.multinet.core;
 
+import java.util.Date;
+
 import com.playphone.multinet.MNGameParams;
 import com.playphone.multinet.MNUserInfo;
 import com.playphone.multinet.MNErrorInfo;
@@ -160,6 +162,14 @@ public interface IMNSessionEventHandler
   void mnSessionSocNetLoggedOut            (int socNetId);
 
   /**
+   * Invoked when social network access token has been changed
+   *
+   * @param socNetId  social network identifier
+   * @param eventData token data
+   */
+  void mnSessionSocNetTokenStatusChanged   (int socNetId, AuthTokenChangedEvent eventData);
+
+  /**
    * Invoked when some error occurred
    * @param errorInfo error information
    * @see MNErrorInfo
@@ -238,9 +248,54 @@ public interface IMNSessionEventHandler
   void mnSessionAppStartParamUpdated     (String param);
 
   /**
+   * Invoked when beacon response has been received
+   * @param beaconResponse response information
+   */
+  void mnSessionAppBeaconResponseReceived (MNAppBeaconResponse beaconResponse);
+
+  /**
    * Invoked when virtual shop ready status has been changed
    * @param isVShopReady true if virtual shop is ready to purchase operations, false - otherwise
    */
   void mnSessionVShopReadyStatusChanged (boolean isVShopReady);
+
+  public class AuthTokenChangedEvent
+   {
+    public AuthTokenChangedEvent (String authToken, Date expirationDate)
+     {
+      this.authToken      = authToken;
+      this.expirationDate = expirationDate;
+      errorMessage        = null;
+     }
+
+    public void setError (String errorMessage)
+     {
+      this.errorMessage = errorMessage;
+     }
+
+    public boolean isError ()
+     {
+      return errorMessage != null;
+     }
+
+    public String getErrorMessage ()
+     {
+      return errorMessage;
+     }
+
+    public String getAuthToken ()
+     {
+      return authToken;
+     }
+
+    public Date getExpirationDate ()
+     {
+      return expirationDate;
+     }
+
+    private String errorMessage;
+    private String authToken;
+    private Date   expirationDate;
+   }
  }
 

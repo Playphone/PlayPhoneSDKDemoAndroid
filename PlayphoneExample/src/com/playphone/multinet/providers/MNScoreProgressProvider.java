@@ -18,6 +18,7 @@ import com.playphone.multinet.MNUserInfo;
 import com.playphone.multinet.core.MNSession;
 import com.playphone.multinet.core.MNSessionEventHandlerAbstract;
 import com.playphone.multinet.core.MNEventHandlerArray;
+import com.playphone.multinet.core.MNUtils;
 
 /**
  * A class representing "ScoreProgress" MultiNet provider.
@@ -432,14 +433,14 @@ public class MNScoreProgressProvider
         return;
        }
 
-      Integer scoreTime = parseInteger(components[0]);
+      Integer scoreTime = MNUtils.parseInteger(components[0]);
 
       if (scoreTime == null)
        {
         return;
        }
 
-      Long score = parseLong(components[1]);
+      Long score = MNUtils.parseLong(components[1]);
 
       if (score == null)
        {
@@ -447,30 +448,6 @@ public class MNScoreProgressProvider
        }
 
       onScoreUpdateReceived(sender,score,scoreTime);
-     }
-
-    private static final Integer parseInteger (String s)
-     {
-      try
-       {
-        return new Integer(s);
-       }
-      catch (NumberFormatException e)
-       {
-        return null;
-       }
-     }
-
-    private static final Long parseLong (String s)
-     {
-      try
-       {
-        return new Long(s);
-       }
-      catch (NumberFormatException e)
-       {
-        return null;
-       }
      }
 
     protected boolean       running;

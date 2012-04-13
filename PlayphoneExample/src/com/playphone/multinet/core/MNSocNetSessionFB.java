@@ -9,11 +9,15 @@ package com.playphone.multinet.core;
 
 import java.net.MalformedURLException;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Date;
 
+import android.os.Bundle;
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.facebook.android.Facebook;
+import com.facebook.android.FacebookError;
 
 public class MNSocNetSessionFB
  {
@@ -80,6 +84,56 @@ public class MNSocNetSessionFB
     editor.commit();
    }
 
+  public synchronized void extendAccessToken ()
+   {
+    if (facebook != null)
+     {
+      if (facebook.shouldExtendAccessToken())
+       {
+        facebook.extendAccessTokenIfNeeded
+         (platform.getContext(),new Facebook.ServiceListener()
+          {
+           private void dispatchEvent (String errorMessage)
+            {
+             IMNSessionEventHandler.AuthTokenChangedEvent eventData =
+              new IMNSessionEventHandler.AuthTokenChangedEvent
+                   (facebook.getAccessToken(),new Date(facebook.getAccessExpires()));
+
+             if (errorMessage != null)
+              {
+               eventData.setError(errorMessage);
+              }
+
+             eventHandler.socNetFBTokenStatusChanged(eventData);
+            }
+
+           public void onComplete (android.os.Bundle values)
+            {
+             dispatchEvent(null);
+            }
+
+           public void onFacebookError (FacebookError e)
+            {
+             dispatchEvent(e.getMessage());
+            }
+
+           public void onError (Error e)
+            {
+             dispatchEvent(e.getMessage());
+            }
+          });
+       }
+      else
+       {
+        IMNSessionEventHandler.AuthTokenChangedEvent eventData =
+         new IMNSessionEventHandler.AuthTokenChangedEvent
+          (facebook.getAccessToken(),new Date(facebook.getAccessExpires()));
+
+        eventHandler.socNetFBTokenStatusChanged(eventData);
+       }
+     }
+   }
+
   public synchronized void setFbAppId (String fbAppId)
    {
     facebook = new Facebook(fbAppId);
@@ -102,7 +156,7 @@ public class MNSocNetSessionFB
                                   useSSO,
                                   new MNSocNetSessionFBUI.IFBDialogEventHandler()
      {
-      public void onSuccess ()
+      public void onSuccess (Bundle response)
        {
         storeAccessToken();
 
@@ -232,7 +286,7 @@ public class MNSocNetSessionFB
                                   prompt,attachment,targetId,actionLinks,
                                   new MNSocNetSessionFBUI.IFBDialogEventHandler()
        {
-        public void onSuccess ()
+        public void onSuccess (Bundle response)
          {
           eventHandler.socNetFBStreamDialogOk();
          }
@@ -261,7 +315,7 @@ public class MNSocNetSessionFB
                                          permission,
                                          new MNSocNetSessionFBUI.IFBDialogEventHandler()
        {
-        public void onSuccess ()
+        public void onSuccess (Bundle response)
          {
           eventHandler.socNetFBPermissionDialogOk();
          }
@@ -281,12 +335,39 @@ public class MNSocNetSessionFB
     return null;
    }
 
+  public synchronized void showGenericDialog (String             action,
+                                              Map<String,String> params,
+                                              final IGenericDialogEventHandler eventHandler)
+   {
+    MNSocNetSessionFBUI.showGenericDialog(platform.getContext(),facebook,
+                                          action,
+                                          params,
+                                          new MNSocNetSessionFBUI.IFBDialogEventHandler()
+     {
+      public void onSuccess (Bundle response)
+       {
+        eventHandler.socNetFBGenericDialogOk(response);
+       }
+
+      public void onError (String error)
+       {
+        eventHandler.socNetFBGenericDialogFailed(error);
+       }
+
+      public void onCancel ()
+       {
+        eventHandler.socNetFBGenericDialogCanceled();
+       }
+     });
+   }
+
   interface IEventHandler
    {
     void socNetFBLoginOk              (MNSocNetSessionFB session);
     void socNetFBLoginCanceled        ();
     void socNetFBLoginFailedWithError (String            error);
     void socNetFBLoggedOut            ();
+    void socNetFBTokenStatusChanged   (IMNSessionEventHandler.AuthTokenChangedEvent eventData);
    }
 
   interface IStreamDialogEventHandler
@@ -301,6 +382,13 @@ public class MNSocNetSessionFB
     void socNetFBPermissionDialogOk             ();
     void socNetFBPermissionDialogCanceled       ();
     void socNetFBPermissionDialogFailedWithError(String    error);
+   }
+
+  interface IGenericDialogEventHandler
+   {
+    void socNetFBGenericDialogOk       (Bundle response);
+    void socNetFBGenericDialogCanceled ();
+    void socNetFBGenericDialogFailed   (String error);
    }
 
   void enableSingleSignOn (boolean enable)

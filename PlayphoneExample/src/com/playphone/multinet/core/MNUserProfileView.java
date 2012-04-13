@@ -16,9 +16,14 @@ import java.util.Map;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 
 import android.app.Activity;
@@ -35,12 +40,14 @@ import android.widget.ProgressBar;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.JsResult;
 import android.util.AttributeSet;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.Canvas;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -89,6 +96,43 @@ public class MNUserProfileView extends FrameLayout
 
   private void webViewLoadStartUrl ()
    {
+    MNConfigData configData = null;
+
+    if (session == null)
+     {
+      return;
+     }
+
+    int delay = session.getConfigData().multiWebFrontLoadDelay;
+
+    if (delay <= 0)
+     {
+      webViewLoadStartUrlLow();
+     }
+    else
+     {
+      synchronized (this)
+       {
+        startPageLoadDelayTimer = new Timer();
+
+        startPageLoadDelayTimer.schedule(new TimerTask()
+         {
+          public void run ()
+           {
+            synchronized (MNUserProfileView.this)
+             {
+              startPageLoadDelayTimer = null;
+             }
+
+            webViewLoadStartUrlLow();
+           }
+         },delay);
+       }
+     }
+   }
+
+  private void webViewLoadStartUrlLow ()
+   {
     runOnUiThread(new Runnable()
      {
       public void run ()
@@ -130,7 +174,7 @@ public class MNUserProfileView extends FrameLayout
                                             "app_ver_int=%s",
                                             webServerUrl,
                                             session.getGameId(),
-                                            MNUtils.stringGetMD5String(session.getPlatform().getUniqueDeviceIdentifier()),
+                                            MNUtils.stringGetMD5String(session.getUniqueAppId()),
                                             session.getPlatform().getDeviceType(),
                                             MNSession.CLIENT_API_VERSION,
                                             Locale.getDefault().toString(),
@@ -197,6 +241,16 @@ public class MNUserProfileView extends FrameLayout
   /* in Android's WebViewCore), so it is */
   public void destroy ()
    {
+    synchronized (this)
+     {
+      if (startPageLoadDelayTimer != null)
+       {
+        startPageLoadDelayTimer.cancel();
+
+        startPageLoadDelayTimer = null;
+       }
+     }
+
     httpReqQueue.shutdown();
     eventHandlers.clearAll();
 
@@ -587,14 +641,13 @@ public class MNUserProfileView extends FrameLayout
         userInfo = "null";
        }
 
-      String javaScriptSrc = String.format
-                              ("javascript:MN_RecvPluginMessage(" +
-                                MNUtils.stringAsJSString(pluginName) +
-                                "," +
-                                MNUtils.stringAsJSString(message) +
-                                "," +
-                                userInfo +
-                                ")");
+      String javaScriptSrc = "javascript:MN_RecvPluginMessage(" +
+                             MNUtils.stringAsJSString(pluginName) +
+                             "," +
+                             MNUtils.stringAsJSString(message) +
+                             "," +
+                             userInfo +
+                             ")";
 
       callJSScript(javaScriptSrc);
      }
@@ -732,6 +785,24 @@ public class MNUserProfileView extends FrameLayout
      }
    }
 
+  public void mnSessionSocNetTokenStatusChanged (int socNetId, IMNSessionEventHandler.AuthTokenChangedEvent eventData)
+   {
+    if (socNetId == MNSocNetSessionFB.SOCNET_ID)
+     {
+      String fbContext = eventData.getAuthToken() != null ?
+                          String.format("new MN_SetSNContextFacebook('%d',%s,%s,%d)",
+                                       MNSocNetSessionFB.USER_ID_UNDEFINED,
+                                       MNUtils.stringAsJSString(""),
+                                       MNUtils.stringAsJSString(eventData.getAuthToken()),
+                                       eventData.getExpirationDate().getTime() != 0 ? 1 : 0) :
+                          MNUtils.stringAsJSString(null);
+
+      callJSScriptNoScheme("MN_SetSNContextFacebook(" + fbContext + "," +
+                           (eventData.isError() ?
+                            MNUtils.stringAsJSString(eventData.getErrorMessage()) : "null") + ")");
+     }
+   }
+
   public void mnSessionDevUsersInfoChanged ()
    {
     devUsersInfoSrcCache = null;
@@ -750,16 +821,6 @@ public class MNUserProfileView extends FrameLayout
     if (session != null && webServerUrl == null)
      {
       webViewLoadStartUrl();
-     }
-   }
-
-  public void mnSessionConfigLoadingFailed (String error)
-   {
-    if (session != null && webServerUrl == null)
-     {
-      loadErrorMessagePage(MNI18n.getLocalizedString
-                            ("Internet connection is not available",
-                             MNI18n.MESSAGE_CODE_INTERNET_CONNECTION_NOT_AVAILABLE_ERROR));
      }
    }
 
@@ -842,6 +903,10 @@ public class MNUserProfileView extends FrameLayout
    {
    }
 
+  public void mnSessionAppBeaconResponseReceived (MNAppBeaconResponse beaconResponse)
+   {
+   }
+
   /* MNSession.SocNetFBEventHandler */
 
   public void socNetFBLoginOk (MNSocNetSessionFB socNetSession)
@@ -913,6 +978,8 @@ public class MNUserProfileView extends FrameLayout
     fbLoginSuccessJS = null;
     fbLoginCancelJS  = null;
 
+    startPageLoadDelayTimer = null;
+
     WebChromeClient webChromeClient = new MNWebChromeClient();
     MNWebViewClient webViewClient   = new MNWebViewClient();
 
@@ -922,6 +989,8 @@ public class MNUserProfileView extends FrameLayout
     webView.setWebViewClient(webViewClient);
     webView.addJavascriptInterface(new MNWebViewAppHost(webView),"MNWebViewAppHost");
     webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+
+    enableWebStorage(context,webView,MAIN_VIEW_DOM_STORAGE_PATH);
 
     webViewLayout.addView(webView,new LinearLayout.LayoutParams
                                        (LayoutParams.FILL_PARENT,
@@ -936,6 +1005,8 @@ public class MNUserProfileView extends FrameLayout
     navBarView.setWebViewClient(webViewClient);
     navBarView.addJavascriptInterface(new MNWebViewAppHost(navBarView),"MNWebViewAppHost");
     navBarView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+
+    enableWebStorage(context,navBarView,NAVBAR_VIEW_DOM_STORAGE_PATH);
 
     webViewLayout.addView(navBarView,new LinearLayout.LayoutParams
                                           (LayoutParams.FILL_PARENT,
@@ -997,6 +1068,13 @@ public class MNUserProfileView extends FrameLayout
 
   private void callUpdateContext (boolean setMode)
    {
+    MNSession session = this.session;
+
+    if (session == null)
+     {
+      return;
+     }
+
     int  status = session.getStatus();
     long userId = session.getMyUserId();
 
@@ -1043,8 +1121,7 @@ public class MNUserProfileView extends FrameLayout
                              MNUtils.stringAsJSString(session.getMySId()),
                              session.getPlatform().getDeviceType(),
                              MNUtils.stringAsJSString
-                              (MNUtils.stringGetMD5String
-                                (session.getPlatform().getUniqueDeviceIdentifier())),
+                              (MNUtils.stringGetMD5String(session.getUniqueAppId())),
                              getDeviceUsersInfoJSSrc(),
                              MNSocNetSessionFB.SOCNET_ID,
                              fbSession.isConnected() ? 10 :
@@ -1192,8 +1269,8 @@ public class MNUserProfileView extends FrameLayout
 
   private class MNWebViewAppHost
           implements MNSocNetSessionFB.IStreamDialogEventHandler,
-                     MNSocNetSessionFB.IPermissionDialogEventHandler
-
+                     MNSocNetSessionFB.IPermissionDialogEventHandler,
+                     MNSocNetSessionFB.IGenericDialogEventHandler
    {
     public MNWebViewAppHost (MNSafeWebView webView)
      {
@@ -1267,6 +1344,14 @@ public class MNUserProfileView extends FrameLayout
             else if (cmd.equals("sn_facebook_dialog_permission_req_show.php"))
              {
               facebookShowPermissionDialog(url);
+             }
+            else if (cmd.equals("sn_facebook_dialog_generic.php"))
+             {
+              facebookShowGenericDialog(url);
+             }
+            else if (cmd.equals("sn_facebook_extend_session.php"))
+             {
+              facebookExtendAccessToken(url);
              }
             else if (cmd.equals("webview_reload.php"))
              {
@@ -2285,6 +2370,60 @@ public class MNUserProfileView extends FrameLayout
        }
      }
 
+    private void facebookShowGenericDialog (MNAppHostRequestURL url)
+     {
+      final String action  = url.getStringParam("action");
+      String encodedParams = url.getStringParam("params");
+      String successJS = url.getStringParam("mn_callback");
+      String cancelJS  = url.getStringParam("mn_cancel");
+      String errorJS   = url.getStringParam("mn_error");
+
+      if (action != null && encodedParams != null &&
+          successJS != null && errorJS != null && cancelJS != null)
+       {
+        try
+         {
+          final HashMap<String,String>  params = MNUtils.httpGetRequestParseParams(encodedParams);
+
+          fbGenericDialogSuccessJS = successJS;
+          fbGenericDialogCancelJS  = cancelJS;
+          fbGenericDialogErrorJS   = errorJS;
+
+          runOnUiThread(new Runnable()
+           {
+            public void run ()
+             {
+              if (session != null)
+               {
+                ((MNPlatformAndroid)session.getPlatform()).setBaseView(MNUserProfileView.this);
+
+                session.getSocNetSessionFB().showGenericDialog
+                 (action,params,MNWebViewAppHost.this);
+               }
+             }
+           });
+         }
+        catch (UnsupportedEncodingException e)
+         {
+          Log.d(TAG,"unable to decode generic fb dialog params: " + e.toString());
+         }
+       }
+      else
+       {
+        Log.d(TAG,"insufficient params to display generic fb dialog");
+       }
+     }
+
+    public void facebookExtendAccessToken (MNAppHostRequestURL url)
+     {
+      final MNSession session = MNUserProfileView.this.session;
+
+      if (session != null)
+       {
+        session.getSocNetSessionFB().extendAccessToken();
+       }
+     }
+
     public void socNetFBStreamDialogOk                 ()
      {
       if (fbPublishSuccessJS != null)
@@ -2343,6 +2482,79 @@ public class MNUserProfileView extends FrameLayout
 
       fbPermissionSuccessJS = null;
       fbPermissionCancelJS  = null;
+     }
+
+    private String buildHttpParamStringFromBundle (Bundle params)
+     {
+      MNUtils.HttpPostBodyStringBuilder builder = new MNUtils.HttpPostBodyStringBuilder();
+
+      if (params != null)
+       {
+        for (String key : params.keySet())
+         {
+          String value = params.getString(key);
+
+          if (value != null)
+           {
+            builder.addParam(key,value);
+           }
+         }
+       }
+
+      return builder.toString();
+     }
+
+    public void socNetFBGenericDialogOk (Bundle response)
+     {
+      final String successJS = fbGenericDialogSuccessJS;
+
+      if (successJS == null)
+       {
+        return;
+       }
+
+      String params = buildHttpParamStringFromBundle(response);
+
+      StringBuilder query = new StringBuilder("fbconnect://success");
+
+      if (params.length() > 0)
+       {
+        query.append('?');
+        query.append(params);
+       }
+
+      callJSScriptNoScheme
+       (successJS.replace("{result_bundle}",
+                          MNUtils.stringAsJSString(query.toString())));
+
+     }
+
+    public void socNetFBGenericDialogCanceled ()
+     {
+      final String cancelJS = fbGenericDialogCancelJS;
+
+      if (cancelJS == null)
+       {
+        return;
+       }
+
+      callJSScriptNoScheme
+       (cancelJS.replace("{cancel_bundle}",
+                         MNUtils.stringAsJSString("fbconnect://cancel")));
+     }
+
+    public void socNetFBGenericDialogFailed   (String error)
+     {
+      final String errorJS = fbGenericDialogErrorJS;
+
+      if (errorJS == null)
+       {
+        return;
+       }
+
+      callJSScriptNoScheme
+       (errorJS.replace("{error_message}",
+                         MNUtils.stringAsJSString(error)));
      }
 
     private void varSave (MNAppHostRequestURL url)
@@ -2486,6 +2698,9 @@ public class MNUserProfileView extends FrameLayout
     private String  fbPublishCancelJS;
     private String  fbPermissionSuccessJS;
     private String  fbPermissionCancelJS;
+    private String  fbGenericDialogSuccessJS;
+    private String  fbGenericDialogErrorJS;
+    private String  fbGenericDialogCancelJS;
    }
 
   private void loadBootPage ()
@@ -2676,6 +2891,44 @@ public class MNUserProfileView extends FrameLayout
      }
    }
 
+  private void enableWebStorage (Context context, WebView webView, String storageDir)
+   {
+    int sdkVersion = Integer.parseInt(android.os.Build.VERSION.SDK);
+
+    if (sdkVersion >= android.os.Build.VERSION_CODES.ECLAIR_MR1)
+     {
+      File storageFile = new File(MNPlatformAndroid.getMultiNetRootDir(context),
+                                  storageDir);
+
+      boolean ok = storageFile.exists() || storageFile.mkdirs();
+
+      if (ok)
+       {
+        WebStorageController.enableWebStorage(webView,storageFile.getAbsolutePath());
+       }
+      else
+       {
+        Log.d(TAG,"unable to create a directory for DOMStorage");
+       }
+     }
+    else
+     {
+      Log.d(TAG,"DOMStorage is not available");
+     }
+   }
+
+  private static class WebStorageController
+   {
+    public static void enableWebStorage (WebView webView, String storagePath)
+     {
+      WebSettings webSettings = webView.getSettings();
+
+      webSettings.setDatabaseEnabled(true);
+      webSettings.setDatabasePath(storagePath);
+      webSettings.setDomStorageEnabled(true);
+     }
+   }
+
   private MNSession session;
   private MNEventHandlerArray<IMNUserProfileViewEventHandler> eventHandlers;
 
@@ -2702,6 +2955,8 @@ public class MNUserProfileView extends FrameLayout
   private String  fbLoginSuccessJS;
   private String  fbLoginCancelJS;
 
+  private Timer startPageLoadDelayTimer;
+
   private static final int NAV_BAR_DEFAULT_HEIGHT = 49;
   private static final int AVATAR_IMAGE_DIMENSION = 55;
   private static final String GAMESET_PLAY_PARAM_PREFIX = "gameset_play_param_";
@@ -2712,6 +2967,9 @@ public class MNUserProfileView extends FrameLayout
 
   private static final String BOOT_PAGE_FILE_NAME = "multinet_boot.html";
   private static final String ERROR_PAGE_FILE_NAME = "multinet_http_error.html";
+
+  private static final String MAIN_VIEW_DOM_STORAGE_PATH   = "mainview_storage";
+  private static final String NAVBAR_VIEW_DOM_STORAGE_PATH = "navview_storage";
 
   private static final int HTTPREQ_FLAG_EVAL_IN_MAINWEBVIEW_MASK   = 0x0001;
   private static final int HTTPREQ_FLAG_EVAL_IN_NAVBARWEBVIEW_MASK = 0x0002;

@@ -38,14 +38,14 @@ import com.playphone.multinet.core.MNSessionEventHandlerAbstract;
 import com.playphone.multinet.providers.MNAchievementsProvider;
 import com.playphone.multinet.providers.MNAchievementsProvider.GameAchievementInfo;
 
-public class MNInfoPanelAchievement {
-	protected static WeakReference<View> binderViewRef = new WeakReference<View>(null);
-	
-	protected static MNAchievementsProvider getAchProvider() {
+class MNInfoPanelAchievement {
+	private WeakReference<View> binderViewRef = new WeakReference<View>(null);
+	private Helper helper = new Helper(); 
+	private MNAchievementsProvider getAchProvider() {
 		return MNDirect.getAchievementsProvider();
 	}
 
-	protected static class PanelEventHandler implements MNAchievementsProvider.IEventHandler {
+	protected class PanelEventHandler implements MNAchievementsProvider.IEventHandler {
 
 		@Override
 		public void onGameAchievementListUpdated() {
@@ -58,7 +58,7 @@ public class MNInfoPanelAchievement {
 		}
 	}
 	
-	private static class SessionEventHandler extends
+	private class SessionEventHandler extends
 			MNSessionEventHandlerAbstract {
 		@Override
 		public void mnSessionStatusChanged(int newStatus, int oldStatus) {
@@ -70,9 +70,9 @@ public class MNInfoPanelAchievement {
 		}
 	}
 	
-	private static SessionEventHandler sessionEventHandler = new SessionEventHandler();
+	private SessionEventHandler sessionEventHandler = new SessionEventHandler();
 	
-	protected static String getAchievementName(final int achievementId) {
+	protected String getAchievementName(final int achievementId) {
 		GameAchievementInfo[] list = getAchProvider().getGameAchievementsList();
 		for (GameAchievementInfo info : list) {
 			if (info.id == achievementId)
@@ -81,7 +81,7 @@ public class MNInfoPanelAchievement {
 		return "";
 	}
 	
-	protected static void onUnlockAchievement(final int achievementId) {
+	protected void onUnlockAchievement(final int achievementId) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -90,15 +90,15 @@ public class MNInfoPanelAchievement {
 					return;
 				}
 				
-				final Bitmap pic = Helper.downloadImageByUrl(
+				final Bitmap pic = helper.downloadImageByUrl(
 						getAchProvider().getAchievementImageURL(achievementId), null);
 				
 				b.post(new Runnable() {
 					@Override
 					public void run() {
 						try {
-							final Context c = Helper.context;
-							final View v = Helper.getAchievementPanel();
+							final Context c = helper.context;
+							final View v = helper.getAchievementPanel();
 							final Resources r = binderViewRef.get().getResources();
 
 							if ((v == null) || (r == null) || (c == null)) {
@@ -126,11 +126,11 @@ public class MNInfoPanelAchievement {
 		}).start();
 	}
 
-	static class Helper {
-		private static Context context = null;
-		private static View panelView = null;
+	class Helper {
+		private Context context = null;
+		private View panelView = null;
 
-		protected static Bitmap downloadImageByUrl(String url,
+		protected Bitmap downloadImageByUrl(String url,
 				BitmapFactory.Options opts) {
 			URL ourUrl = null;
 			try {
@@ -154,7 +154,7 @@ public class MNInfoPanelAchievement {
 			return null;
 		}
 		
-		public synchronized static View getAchievementPanel() {
+		public synchronized View getAchievementPanel() {
 			
 			if (context == null) {
 				return null;
@@ -166,13 +166,13 @@ public class MNInfoPanelAchievement {
 				int panelId = res.getIdentifier("mninfopanelachievement", "layout",
 						context.getPackageName());
 				panelView = inflater.inflate(panelId, null, false);
-				Helper.setVisible(false);
+				helper.setVisible(false);
 			}
 
 			return panelView;
 		}
 
-		public synchronized static void bindTo(ViewGroup vg) {
+		public synchronized void bindTo(ViewGroup vg) {
 			if (panelView != null) {
 				ViewGroup parentVG = (ViewGroup) (panelView.getParent());
 
@@ -186,37 +186,37 @@ public class MNInfoPanelAchievement {
 			}
 		}
 
-		public synchronized static void setContext(Context context) {
-			Helper.context = context;
+		public synchronized void setContext(Context context) {
+			helper.context = context;
 			if (context == null){
 			    panelView = null;
 			}
 		}
 		
 		
-		public static void setVisible(boolean visible) {
+		public void setVisible(boolean visible) {
 			if (panelView != null) {
 				panelView.setVisibility(visible ? View.VISIBLE : View.GONE);
 			}
 		}
 	}
-	protected static MNAchievementsProvider.IEventHandler panelEventHandler = null;
+	protected MNAchievementsProvider.IEventHandler panelEventHandler = null;
 	
 	//protected static PanelEventHandler panelEventHandler = null;
 	
-	public static void bind(final View v) {
+	public void bind(final View v) {
 		MNSession session = MNDirect.getSession();
 		MNAchievementsProvider provider = getAchProvider();
 		
 		if (session == null) {
 			Log.w("MNInfoPanelAchievement","unexpected MNSession is null, please check for MNDirect initialized");
-			Helper.setContext(null);
+			helper.setContext(null);
 			return;
 		}
 		
 		if (provider == null) {
 			Log.w("MNInfoPanelAchievement","unexpected MNAchievementProvider is null");
-			Helper.setContext(null);
+			helper.setContext(null);
 			return;
 		}
 		
@@ -237,13 +237,13 @@ public class MNInfoPanelAchievement {
 			
 		if (v == null) {
 			session.removeEventHandler(sessionEventHandler);
-			Helper.setContext(null);
+			helper.setContext(null);
 		} else {
-			Helper.setContext(v.getContext());
+			helper.setContext(v.getContext());
 			v.post(new Runnable() {
 				@Override
 				public void run() {
-					Helper.bindTo((ViewGroup) v);
+					helper.bindTo((ViewGroup) v);
 					if (isAnimationState) {
 						animate();
 					}
@@ -254,7 +254,7 @@ public class MNInfoPanelAchievement {
 		}
 	}
 
-	public static void bind(Activity activity) {
+	public void bind(Activity activity) {
 		if (activity == null) {
 			bind((View) null);
 		} else{
@@ -270,10 +270,10 @@ public class MNInfoPanelAchievement {
 		}
 	}
 
-	protected static boolean isAnimationState = false;
+	protected boolean isAnimationState = false;
 
-	protected static void animate() {
-		if (Helper.context == null) {
+	protected void animate() {
+		if (helper.context == null) {
 			return;
 		}
 		
@@ -284,16 +284,16 @@ public class MNInfoPanelAchievement {
 		final Resources res = binderViewRef.get().getResources();
 		
 		final int animationId = res.getIdentifier("mndirectpopupanimation",
-				"anim", Helper.context.getPackageName());
+				"anim", helper.context.getPackageName());
 		final Animation movingAnim = AnimationUtils.loadAnimation(
-				Helper.context, animationId);
+				helper.context, animationId);
 
 		movingAnim.setAnimationListener(new AnimationListener() {
 
 			@Override
 			public void onAnimationStart(Animation animation) {
 				isAnimationState = true;
-				Helper.setVisible(true);
+				helper.setVisible(true);
 			}
 
 			@Override
@@ -302,7 +302,7 @@ public class MNInfoPanelAchievement {
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				Helper.setVisible(false);
+				helper.setVisible(false);
 				isAnimationState = false;
 			}
 		});
@@ -310,14 +310,14 @@ public class MNInfoPanelAchievement {
 		binderViewRef.get().post(new Runnable() {
 			@Override
 			public void run() {
-				if (Helper.context != null) {
-					Helper.getAchievementPanel().startAnimation(movingAnim);
+				if (helper.context != null) {
+					helper.getAchievementPanel().startAnimation(movingAnim);
 				}
 			}
 		});
 	}
 	
-	public static void unlockAchievement (Integer achievementId) {
+	public void unlockAchievement (Integer achievementId) {
 		if (MNDirect.isUserLoggedIn()) {
 			getAchProvider().unlockPlayerAchievement(achievementId);
 		} else {
@@ -325,9 +325,9 @@ public class MNInfoPanelAchievement {
 		}
 	}
 	
-	private static IEventHandler eventHandler = null; 
+	private IEventHandler eventHandler = null; 
 	
-	public static IEventHandler getDirectUIEventHandler () {
+	public IEventHandler getDirectUIEventHandler () {
 		if (eventHandler == null) {
 			eventHandler = new IEventHandler() {
 				@Override
@@ -344,32 +344,32 @@ public class MNInfoPanelAchievement {
 	}
 	
 	
-	private static void fillNotificationView(View v, final int achievementId) {
-		final Bitmap pic = Helper.downloadImageByUrl(
+	private void fillNotificationView(View v, final int achievementId) {
+		final Bitmap pic = helper.downloadImageByUrl(
 				getAchProvider().getAchievementImageURL(achievementId), null);
 		
-		final Resources r = Helper.context.getApplicationContext().getResources();
-		final int imgId = r.getIdentifier("mndirect_popup_icon", "id", Helper.context.getPackageName());
+		final Resources r = helper.context.getApplicationContext().getResources();
+		final int imgId = r.getIdentifier("mndirect_popup_icon", "id", helper.context.getPackageName());
 		final ImageView achImageView = (ImageView) v.findViewById(imgId);
 
-		final int descId = r.getIdentifier("mndirect_popup_text", "id", Helper.context.getPackageName());
+		final int descId = r.getIdentifier("mndirect_popup_text", "id", helper.context.getPackageName());
 		final TextView achDescView = (TextView) v.findViewById(descId);
 		
 		achImageView.setImageBitmap(pic);
 		achDescView.setText(getAchievementName(achievementId));
 	}
 	
-	private static void showNotification(final int achievementId) {
+	private void showNotification(final int achievementId) {
 		try {
-			Resources res = Helper.context.getApplicationContext().getResources();
-			int panelId = res.getIdentifier("mninfopanelachievement","layout", Helper.context.getPackageName());
-	        LayoutInflater li = (LayoutInflater) Helper.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			Resources res = helper.context.getApplicationContext().getResources();
+			int panelId = res.getIdentifier("mninfopanelachievement","layout", helper.context.getPackageName());
+	        LayoutInflater li = (LayoutInflater) helper.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			// View tv = Helper.getNetworkPanel();
 	        View tv = li.inflate(panelId, null);
 
 			fillNotificationView(tv, achievementId);
 
-			Toast t = Toast.makeText(Helper.context, "Achievement notification",
+			Toast t = Toast.makeText(helper.context, "Achievement notification",
 					Toast.LENGTH_SHORT);
 			t.setView(tv);
 			t.setGravity(Gravity.TOP, 0, 0);
@@ -380,7 +380,7 @@ public class MNInfoPanelAchievement {
 		}
 	}
 	
-	protected static class ToastEventHandler implements MNAchievementsProvider.IEventHandler {
+	protected class ToastEventHandler implements MNAchievementsProvider.IEventHandler {
 
 		@Override
 		public void onGameAchievementListUpdated() {

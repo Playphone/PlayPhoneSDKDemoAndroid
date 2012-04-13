@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/network_popup"
+    android:layout_width="fill_parent"
+    android:layout_height="40dp"
+    android:visibility="visible" >
+    
+    <RelativeLayout
+        android:id="@+id/fillarea"
+        android:layout_width="fill_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:gravity="left"
+        android:background="@drawable/mndirectpopup_m" >
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/mndirect_popup_leftpart"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_alignParentLeft="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/mndirectpopup_l" >
+    </ImageView>
+    
+
+    <ImageView
+        android:id="@+id/mndirect_popup_rightpart"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_alignParentRight="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/mndirectpopup_r" >
+    </ImageView>
+
+    <ImageView
+        android:id="@+id/mndirect_popup_icon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
+        android:scaleType="fitXY" />
+
+    <TextView
+        android:id="@+id/mndirect_popup_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:paddingLeft="42dp"
+        android:textColor="#636363" >
+    </TextView>
+
+</RelativeLayout>

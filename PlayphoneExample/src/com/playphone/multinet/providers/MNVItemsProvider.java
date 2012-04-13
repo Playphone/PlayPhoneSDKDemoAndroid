@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  */
 public class MNVItemsProvider
  {
-  public static final int TRANSACTION_ID_UNDEFINED = 0;
+  public static final long TRANSACTION_ID_UNDEFINED = 0;
 
   public static final int VITEM_IS_CURRENCY_MASK     = 0x0001;
   public static final int VITEM_IS_UNIQUE_MASK       = 0x0002;

@@ -16,9 +16,13 @@ import java.util.Map;
 
 public interface IMNPlatform
  {
+  public static final int PROPERTY_UDID                = 0;
+  public static final int PROPERTY_PHONE_DEVICE_ID     = 1;
+  public static final int PROPERTY_PHONE_SUBSCRIBER_ID = 2;
+  public static final int PROPERTY_PHONE_NUMBER        = 3;
+
   int              getDeviceType             ();
-  String           getUniqueDeviceIdentifier ();
-  String           getUniqueDeviceIdentifier2();
+  String           getDeviceProperty         (int property);
   String           getDeviceInfoString       ();
   String           getMultiNetConfigURL      ();
 
@@ -37,6 +41,8 @@ public interface IMNPlatform
 
   MNUserProfileView createUserProfileView    ();
   void              runOnUiThread            (Runnable action);
+
+  String           getWiFiMACAddress         ();
 
   void              logWarning               (String tag, String message);
  }

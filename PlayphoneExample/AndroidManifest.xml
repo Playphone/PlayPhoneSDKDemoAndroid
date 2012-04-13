@@ -1,126 +1,224 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.playphone.sdk.example"
-      android:versionCode="104090"
-      android:versionName="1.4.9">
-    <uses-sdk android:minSdkVersion="7"  android:targetSdkVersion="8"/>
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-    <uses-permission android:name="android.permission.READ_CONTACTS"></uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"></uses-permission>
+    package="com.playphone.sdk.example"
+    android:versionCode="200010"
+    android:versionName="2.0.1" >
+
+    <uses-sdk
+        android:minSdkVersion="7"
+        android:targetSdkVersion="8" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="com.android.vending.BILLING" />
 
-    <application android:icon="@drawable/playphone_sdk" android:label="@string/app_name" android:debuggable="true">
-        <activity android:theme="@style/CustomTheme" android:name=".MainActivity"
-                  android:label="@string/app_name"
-                  android:configChanges="orientation|keyboard|keyboardHidden">
+    <application
+        android:debuggable="true"
+        android:icon="@drawable/playphone_sdk"
+        android:label="@string/app_name" >
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:label="@string/app_name"
+            android:theme="@style/CustomTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <activity android:theme="@style/CustomTheme" android:name="com.playphone.multinet.core.MNProxyActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".NotImplementedActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".PostAchievementActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".PostCloudStorageActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VirtualItemsActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".BuyItemsActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".CurrentUserInfoActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".MultiPlayerActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".LogoutActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VirtualEconomyListActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VirtualItemsHomeActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VirtualItemsListActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VirtualItemsDetailsActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VirtualCurrenciesListActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VirtualCurrenciesDetailsActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".StoreHome"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VShopCategoriesListActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VShopPacksListActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".VirtualPackDetailsActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".BuyVShopPacksActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".LoginUserActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".DashboardPageActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".SocialGraphActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".DashboardControlActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".NotificationPanelActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".InventoryHomeActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".InventoryListActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".InventoryManageActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".LeaderboardHome"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".LeaderboardsDetailsActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".LeaderboardDetailShowActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".AchievementsHomeActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".SocialGraphDetailActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".ServerInfoActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".ApplicationInfoActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".GameSettingActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".GameSettingDetailActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".GameLeaderBoardActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".PlayerLeaderBoardActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".CookiesModeActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".CookiesAnyRoomActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <activity android:theme="@style/CustomTheme" android:name=".CookiesCurrentRoomActivity"
-              android:configChanges="orientation|keyboard|keyboardHidden"/>
-        <receiver android:name="com.playphone.multinet.core.MNInstallReferrerReceiver"
-          android:exported="true">
-    		<intent-filter>
-        		<action android:name="com.android.vending.INSTALL_REFERRER"/>
-    		</intent-filter>
-		</receiver>
-        
-	<!-- Billing service -->
-			<service
-				android:name="com.playphone.multinet.core.inappbilling.MNInAppBillingService" />
-			<receiver
-				android:name="com.playphone.multinet.core.inappbilling.MNInAppBillingReceiver">
-				<intent-filter>
-					<action android:name="com.android.vending.billing.RESPONSE_CODE" />
-					<action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
-					<action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
-				</intent-filter>
-			</receiver>
+        <activity
+            android:name="com.playphone.multinet.core.MNProxyActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".NotImplementedActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".PostAchievementActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".PostCloudStorageActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VirtualItemsActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".BuyItemsActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".CurrentUserInfoActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".MultiPlayerActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".LogoutActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VirtualEconomyListActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VirtualItemsHomeActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VirtualItemsListActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VirtualItemsDetailsActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VirtualCurrenciesListActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VirtualCurrenciesDetailsActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".StoreHome"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VShopCategoriesListActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VShopPacksListActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".VirtualPackDetailsActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".BuyVShopPacksActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".LoginUserActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".DashboardPageActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".SocialGraphActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".DashboardControlActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".NotificationPanelActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".InventoryHomeActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".InventoryListActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".InventoryManageActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".LeaderboardHome"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".LeaderboardsDetailsActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".LeaderboardDetailShowActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".AchievementsHomeActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".SocialGraphDetailActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".ServerInfoActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".ApplicationInfoActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".GameSettingActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".GameSettingDetailActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".GameLeaderBoardActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".PlayerLeaderBoardActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".CookiesModeActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".CookiesAnyRoomActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".CookiesCurrentRoomActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
+        <activity
+            android:name=".LatencyActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden"
+            android:theme="@style/CustomTheme" />
 
+        <receiver
+            android:name="com.playphone.multinet.core.MNInstallReferrerReceiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Billing service -->
+        <service android:name="com.playphone.multinet.core.inappbilling.MNInAppBillingService" />
+
+        <receiver android:name="com.playphone.multinet.core.inappbilling.MNInAppBillingReceiver" >
+            <intent-filter>
+                <action android:name="com.android.vending.billing.RESPONSE_CODE" />
+                <action android:name="com.android.vending.billing.IN_APP_NOTIFY" />
+                <action android:name="com.android.vending.billing.PURCHASE_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
+
 </manifest>
