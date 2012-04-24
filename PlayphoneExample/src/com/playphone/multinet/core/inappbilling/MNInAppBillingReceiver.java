@@ -17,6 +17,8 @@ public class MNInAppBillingReceiver extends BroadcastReceiver
    {
     final String action = intent.getAction();
 
+    MNInAppBillingLog.d(this,"action " + action + "received");
+
     if      (action.equals(ACTION_INAPP_NOTIFY))
      {
       handleInAppNotify(intent);

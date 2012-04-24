@@ -74,6 +74,11 @@ class MNVShopInAppBilling implements MNInAppBilling.IEventHandler
       return;
      }
 
+    if (!session.isUserLoggedIn())
+     {
+      Log.w(TAG,"in-app purchase is started while user is not logged in");
+     }
+
     MNInAppBilling.SyncResponse syncResponse;
 
     try

@@ -420,6 +420,8 @@ public class MNInAppBilling
   /* on... methods are called by MNInAppBillingReceiver  */
   /* package */ static synchronized void onInAppNotifyReceived (String notificationId)
    {
+    MNInAppBillingLog.d(MNInAppBilling.class,"handling IN_APP_NOTIFY message with notificationId " + notificationId);
+
     if (eventHandler != null)
      {
       eventHandler.onInAppNotifyReceived(notificationId);
@@ -432,6 +434,11 @@ public class MNInAppBilling
 
   /* package */ static synchronized void onResponseCodeReceived (long requestId, int responseCode)
    {
+    MNInAppBillingLog.d
+     (MNInAppBilling.class,
+      "handling RESPONSE_CODE message with requestId " + Long.toString(requestId) +
+       " and response code " + Integer.toString(responseCode));
+
     if (eventHandler != null)
      {
       eventHandler.onResponseCodeReceived(requestId,responseCode);
@@ -444,6 +451,9 @@ public class MNInAppBilling
 
   /* package */ static synchronized void onPurchaseStateChangedReceived (String signedData, String signature)
    {
+    MNInAppBillingLog.d
+     (MNInAppBilling.class,"handling PURCHASE_STATE_CHANGED message");
+
     if (eventHandler != null)
      {
       eventHandler.onPurchaseStateChangedReceived(signedData,signature);

@@ -227,6 +227,12 @@ public class MNDirectUIHelper {
 	protected synchronized static void bindDashboard(Activity a) {
 		final MNUserProfileView upv = MNDirect.getView();
 		final MNSession s = MNDirect.getSession();
+		
+		if (s == null) {
+			// on case if session already destroyed
+			return;
+		}
+		
 		if (a != null) {
 			dashboard = new Dashboard(a);
 			s.addEventHandler(eh);

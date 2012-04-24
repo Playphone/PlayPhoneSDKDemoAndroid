@@ -2115,6 +2115,8 @@ public class MNUserProfileView extends FrameLayout
        {
         Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(marketUrl));
 
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
         getHostActivity().startActivity(intent);
        }
       else
