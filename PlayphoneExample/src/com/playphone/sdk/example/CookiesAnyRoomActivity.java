@@ -6,12 +6,10 @@ import java.util.List;
 
 import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.MNDirectUIHelper;
-import com.playphone.multinet.core.ws.IMNWSRequestEventHandler;
-import com.playphone.multinet.core.ws.MNWSRequestContent;
-import com.playphone.multinet.core.ws.MNWSRequestError;
-import com.playphone.multinet.core.ws.MNWSRequestSender;
-import com.playphone.multinet.core.ws.MNWSResponse;
+
 import com.playphone.multinet.core.ws.data.MNWSRoomListItem;
+
+import com.playphone.multinet.providers.MNWSInfoRequestCurrGameRoomList;
 import com.playphone.multinet.providers.MNGameRoomCookiesProvider;
 
 import android.os.Bundle;
@@ -57,63 +55,32 @@ public class CookiesAnyRoomActivity extends CustomTitleActivity implements
 	}
 
 	public class RoomListRequestEventHandler implements
-			IMNWSRequestEventHandler {
-		private final String blockName;
+			MNWSInfoRequestCurrGameRoomList.IEventHandler {
+          public void onCompleted (MNWSInfoRequestCurrGameRoomList.RequestResult result) {
+            if (!result.hadError()) {
+              CookiesAnyRoomActivity.this.roomList.clear();
 
-		public RoomListRequestEventHandler(String blockName) {
-			this.blockName = blockName;
-		}
+              for (MNWSRoomListItem item : result.getDataEntry()) {
+                CookiesAnyRoomActivity.this.roomList.add(item);
+              }
 
-		@Override
-		public void onRequestError(MNWSRequestError error) {
-			Message msg = handler.obtainMessage(ROOM_LIST_REQUEST_ERROR,error);
-			msg.sendToTarget();
-			handler.sendEmptyMessage(STOP_ROOM_LIST_PROGRESS);
-		}
-
-		@Override
-		public void onRequestCompleted(MNWSResponse response) {
-			// get room list from response, using block name which was
-			// previously received from the
-			// MNWSRequestContent.addCurrGameRoomList call
-			// the "room list" request returns data as a List of
-			// MNWSRoomListItem objects, so
-			// it is safe to explicitly cast the result of this call to
-			// List<MNWSRoomListItem>
-			@SuppressWarnings("unchecked")
-			List<MNWSRoomListItem> rooms = (List<MNWSRoomListItem>) response
-					.getDataForBlock(blockName);
-
-			CookiesAnyRoomActivity.this.roomList.clear();
-			CookiesAnyRoomActivity.this.roomList.addAll(rooms);
-
-			handler.sendEmptyMessage(ROOM_LIST_REQUEST_SUCCESS);
-			handler.sendEmptyMessage(STOP_ROOM_LIST_PROGRESS);
-		}
+              handler.sendEmptyMessage(ROOM_LIST_REQUEST_SUCCESS);
+              handler.sendEmptyMessage(STOP_ROOM_LIST_PROGRESS);
+            }
+            else {
+              Message msg = handler.obtainMessage(ROOM_LIST_REQUEST_ERROR,result.getErrorMessage());
+              msg.sendToTarget();
+              handler.sendEmptyMessage(STOP_ROOM_LIST_PROGRESS);
+            }
+          }
 	}
 
 	private void requestRoomList() {
-		handler.sendEmptyMessage(START_ROOM_LIST_PROGRESS);
+          handler.sendEmptyMessage(START_ROOM_LIST_PROGRESS);
 
-		// create content object
-		MNWSRequestContent requestContent = new MNWSRequestContent();
-
-		// add the "subscription status" request which returns information of
-		// the "subscriber" status of current player
-		// and provider related subscription options.
-		// store the block name returned by "add..." call to use it later to
-		// extract subscription information from response
-		String blockName = requestContent.addCurrGameRoomList();
-
-		// create the "request sender" object
-		MNWSRequestSender requestSender = new MNWSRequestSender(
-				MNDirect.getSession());
-
-		// send the "authorized" request, passing the created content object and
-		// event handler
-		// (assuming that "self" implements MNWSRequestDelegate protocol)
-		requestSender.sendWSRequestAuthorized(requestContent,
-				new RoomListRequestEventHandler(blockName));
+          MNDirect.getWSProvider().send
+           (new MNWSInfoRequestCurrGameRoomList
+             (new RoomListRequestEventHandler()));
 	}
 
 	MNGameRoomCookiesProvider.IEventHandler eventHandler = new MNGameRoomCookiesProvider.IEventHandler() {
@@ -239,9 +206,9 @@ public class CookiesAnyRoomActivity extends CustomTitleActivity implements
 	@Override
 	public boolean handleMessage(Message msg) {
 		if (ROOM_LIST_REQUEST_ERROR == msg.what) {
-			MNWSRequestError error = (MNWSRequestError) msg.obj;
+			String errorMessage = (String)msg.obj;
 			Toast.makeText(this,
-					"Room list request error :\n   " + error.getMessage(),
+					"Room list request error :\n   " + errorMessage,
 					Toast.LENGTH_LONG).show();
 		} else if (ROOM_LIST_REQUEST_SUCCESS == msg.what) {
 			roomListUpdated();

@@ -22,12 +22,8 @@ import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.MNDirectUIHelper;
 import com.playphone.multinet.core.IMNSessionEventHandler;
 import com.playphone.multinet.core.MNSessionEventHandlerAbstract;
-import com.playphone.multinet.core.ws.IMNWSRequestEventHandler;
-import com.playphone.multinet.core.ws.MNWSRequestContent;
-import com.playphone.multinet.core.ws.MNWSRequestError;
-import com.playphone.multinet.core.ws.MNWSRequestSender;
-import com.playphone.multinet.core.ws.MNWSResponse;
 import com.playphone.multinet.core.ws.data.MNWSBuddyListItem;
+import com.playphone.multinet.providers.MNWSInfoRequestCurrUserBuddyList;
 
 public class SocialGraphActivity extends CustomTitleListActivity implements
 		Handler.Callback {
@@ -36,22 +32,7 @@ public class SocialGraphActivity extends CustomTitleListActivity implements
 	ArrayAdapter<MNWSBuddyListItem> aa = null;
 
 	protected void requestBuddyList() {
-		// send request
-		// create content object
-		MNWSRequestContent content = new MNWSRequestContent();
-
-		// add "friend list" request to request content.
-		// store block name returned by the "add..." call to use it later to
-		// extract friends information from response
-		String blockName = content.addCurrUserBuddyList();
-
-		// create "request sender" object
-		MNWSRequestSender sender = new MNWSRequestSender(MNDirect.getSession());
-
-		// send "authorized" request, passing created content object and event
-		// handler
-		sender.sendWSRequestAuthorized(content, new MyBuddyListResponseHandler(
-				blockName));
+          MNDirect.getWSProvider().send(new MNWSInfoRequestCurrUserBuddyList(new MyBuddyListResponseHandler()));
 	}
 
 	IMNSessionEventHandler mnDirectEventHandler = new MNSessionEventHandlerAbstract() {
@@ -133,30 +114,25 @@ public class SocialGraphActivity extends CustomTitleListActivity implements
 	}
 
 	protected class MyBuddyListResponseHandler implements
-			IMNWSRequestEventHandler {
-		private String blockName;
+			MNWSInfoRequestCurrUserBuddyList.IEventHandler {
+          public void onCompleted (MNWSInfoRequestCurrUserBuddyList.RequestResult result) {
+            if (!result.hadError()) {
+              Log.d("playphone","Request completed");
+              buddiesList.clear();
 
-		// store the block name which is used to access data in
-		// onRequestCompleted method
-		public MyBuddyListResponseHandler(String blockName) {
-			this.blockName = blockName;
-		}
+              for (MNWSBuddyListItem item : result.getDataEntry()) {
+                buddiesList.add(item);
+              }
 
-		@SuppressWarnings("unchecked")
-		public void onRequestCompleted(MNWSResponse response) {
-			Log.d("playphone", "Request completed");
-			buddiesList.clear();
-			buddiesList.addAll((List<MNWSBuddyListItem>) response
-					.getDataForBlock(blockName));
-			handler.sendEmptyMessage(ON_BUDDY_LIST_UPDATED);
-			handler.sendEmptyMessage(UPDATING_IS_OK);
-		}
-
-		public void onRequestError(MNWSRequestError error) {
-			// log error message
-			Log.e("BuddyListResponse", error.getMessage());
-			handler.sendEmptyMessage(UPDATING_IS_FAIL);
-		}
+              handler.sendEmptyMessage(ON_BUDDY_LIST_UPDATED);
+              handler.sendEmptyMessage(UPDATING_IS_OK);
+            }
+            else {
+              // log error message
+              Log.e("BuddyListResponse",result.getErrorMessage());
+              handler.sendEmptyMessage(UPDATING_IS_FAIL);
+            }
+          }
 	}
 
 	@Override

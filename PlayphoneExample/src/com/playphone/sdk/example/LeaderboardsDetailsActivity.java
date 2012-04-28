@@ -17,12 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.playphone.multinet.MNDirect;
-import com.playphone.multinet.core.ws.IMNWSRequestEventHandler;
-import com.playphone.multinet.core.ws.MNWSRequestContent;
-import com.playphone.multinet.core.ws.MNWSRequestError;
-import com.playphone.multinet.core.ws.MNWSRequestSender;
-import com.playphone.multinet.core.ws.MNWSResponse;
+
 import com.playphone.multinet.core.ws.data.MNWSLeaderboardListItem;
+import com.playphone.multinet.providers.MNWSInfoRequestLeaderboard;
 
 public class LeaderboardsDetailsActivity extends CustomTitleActivity implements
 		Callback {
@@ -84,77 +81,47 @@ public class LeaderboardsDetailsActivity extends CustomTitleActivity implements
 	}
 
 	protected class MyLeaderboardResponseHandler implements
-			IMNWSRequestEventHandler {
-		// store the block name which is used to access data in the
-		// onRequestCompleted method
-		public MyLeaderboardResponseHandler(String blockName) {
-			this.blockName = blockName;
-		}
+			MNWSInfoRequestLeaderboard.IEventHandler {
+          public void onCompleted (MNWSInfoRequestLeaderboard.RequestResult result) {
+            if (!result.hadError()) {
+              MNWSLeaderboardListItem[] leaderboard = result.getDataEntry();
 
-		public void onRequestCompleted(MNWSResponse response) {
-			// get leaderboard data from response, using block name which was
-			// previously retrieved from
-			// MNWSRequestContent.addCurrUserLeaderboard call
-			// "leaderboard" requests return data as a list of
-			// MNWSLeaderboardListItem objects, so
-			// it is safe to cast explicit result of this call to
-			// List<MNWSLeaderboardListItem>
-			@SuppressWarnings("unchecked")
-			List<MNWSLeaderboardListItem> leaderboard = (List<MNWSLeaderboardListItem>) response
-					.getDataForBlock(blockName);
+              // Iterate over the returned list and print the name of the player
+              // and his/her highest score
+              ArrayList<String> usernames = new ArrayList<String>();
+              ArrayList<String> scores = new ArrayList<String>();
 
-			// Iterate over the returned list and print the name of the player
-			// and his/her highest score
-			ArrayList<String> usernames = new ArrayList<String>();
-			ArrayList<String> scores = new ArrayList<String>();
+              for (MNWSLeaderboardListItem item : leaderboard) {
+                Log.d("playphone","Player : " + item.getUserNickName()
+                                  + " gamesetid: " + String.valueOf(item.getGamesetId())
+                                  + " score: " + item.getOutHiScoreText());
+                usernames.add(item.getUserNickName());
+                scores.add(item.getOutHiScoreText());
+               }
 
-			for (MNWSLeaderboardListItem item : leaderboard)
-
-			{
-				Log.d("playphone", "Player : " + item.getUserNickName()
-						+ " gamesetid: " + String.valueOf(item.getGamesetId())
-						+ " score: " + item.getOutHiScoreText());
-				usernames.add(item.getUserNickName());
-				scores.add(item.getOutHiScoreText());
-			}
-
-			Message msg = Message.obtain();
-			Bundle bundle = new Bundle();
-			bundle.putStringArrayList("usernames", usernames);
-			bundle.putStringArrayList("scores", scores);
-			msg.setData(bundle);
-			LeaderboardsDetailsActivity.this.handler.sendMessage(msg);
-		}
-
-		public void onRequestError(MNWSRequestError error) {
-			Toast.makeText(LeaderboardsDetailsActivity.this,
-					error.getMessage(), Toast.LENGTH_LONG).show();
-			// log error message
-			Log.e("LeaderboardResponse", error.getMessage());
-		}
-
-		private String blockName;
+              Message msg = Message.obtain();
+              Bundle bundle = new Bundle();
+              bundle.putStringArrayList("usernames", usernames);
+              bundle.putStringArrayList("scores", scores);
+              msg.setData(bundle);
+              LeaderboardsDetailsActivity.this.handler.sendMessage(msg);
+            }
+            else {
+              Toast.makeText(LeaderboardsDetailsActivity.this,
+                             result.getErrorMessage(),Toast.LENGTH_LONG).show();
+              // log error message
+              Log.e("LeaderboardResponse",result.getErrorMessage());
+            }
+          }
 	}
 
 	private void leaderBoardRequest() {
-		// create content object
-		MNWSRequestContent content = new MNWSRequestContent();
-
-		// add the "leaderboard" request which returns the global leaderboard
-		// for the last game to request content.
-		// store the block name returned by "add..." call to use it later to
-		// extract leaderboard data from response
-		String blockName = content.addCurrUserLeaderboard(
-				MNWSRequestContent.LEADERBOARD_SCOPE_GLOBAL,
-				MNWSRequestContent.LEADERBOARD_PERIOD_ALL_TIME);
-
-		// create "request sender" object
-		MNWSRequestSender sender = new MNWSRequestSender(MNDirect.getSession());
-
-		// send the "authorized" request, passing the created content object and
-		// event handler
-		sender.sendWSRequestAuthorized(content,
-				new MyLeaderboardResponseHandler(blockName));
+          MNDirect.getWSProvider()
+           .send(new MNWSInfoRequestLeaderboard
+             (new MNWSInfoRequestLeaderboard.LeaderboardModeCurrentUser
+                  (MNWSInfoRequestLeaderboard.LEADERBOARD_SCOPE_GLOBAL,
+                   MNWSInfoRequestLeaderboard.LEADERBOARD_PERIOD_ALL_TIME),
+              new MyLeaderboardResponseHandler()));
 	}
 
 	@Override

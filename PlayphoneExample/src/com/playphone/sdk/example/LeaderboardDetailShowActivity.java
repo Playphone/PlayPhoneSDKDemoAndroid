@@ -20,12 +20,10 @@ import android.widget.Toast;
 import com.playphone.multinet.MNConst;
 import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.MNDirectUIHelper;
-import com.playphone.multinet.core.ws.IMNWSRequestEventHandler;
+
 import com.playphone.multinet.core.ws.MNWSRequestContent;
-import com.playphone.multinet.core.ws.MNWSRequestError;
-import com.playphone.multinet.core.ws.MNWSRequestSender;
-import com.playphone.multinet.core.ws.MNWSResponse;
 import com.playphone.multinet.core.ws.data.MNWSLeaderboardListItem;
+import com.playphone.multinet.providers.MNWSInfoRequestLeaderboard;
 
 public class LeaderboardDetailShowActivity extends CustomTitleListActivity
 		implements Callback, OnClickListener {
@@ -37,7 +35,7 @@ public class LeaderboardDetailShowActivity extends CustomTitleListActivity
 
 	ArrayAdapter<MNWSLeaderboardListItem> aa = null;
 	Handler handler = new Handler(this);
-	List<MNWSLeaderboardListItem> leaderboard = new ArrayList<MNWSLeaderboardListItem>();
+	ArrayList<MNWSLeaderboardListItem> leaderboard = new ArrayList<MNWSLeaderboardListItem>();
 	int scope;
 	int period;
 	int gameId;
@@ -53,69 +51,46 @@ public class LeaderboardDetailShowActivity extends CustomTitleListActivity
 	}
 
 	private void leaderBoardRequest() {
-		// create content object
-		MNWSRequestContent content = new MNWSRequestContent();
+          MNWSInfoRequestLeaderboard.LeaderboardMode mode = null;
 
-		// add the "leaderboard" request which returns the global leaderboard
-		// for the last game to request content.
-		// store the block name returned by "add..." call to use it later to
-		// extract leaderboard data from response
-		String blockName;
+          if (request.equalsIgnoreCase(CURRUSER_LEADERBOARD_REQUEST)) {
+            mode = new MNWSInfoRequestLeaderboard.LeaderboardModeCurrentUser(scope,period);
+          }
+          else if (request.equalsIgnoreCase(ANYGAME_LEADERBOARD_REQUEST)) {
+            mode = new MNWSInfoRequestLeaderboard.LeaderboardModeAnyGameGlobal(gameId,gameSetId,period);
+          }
+          else if (request.equalsIgnoreCase(ANYUSERGLOBAL_LEADERBOARD_REQUEST)) {
+            mode = new MNWSInfoRequestLeaderboard.LeaderboardModeAnyUserAnyGameGlobal(userId,gameId,gameSetId,period);
+          }
+          else if (request.equalsIgnoreCase(CURRUSERLOCAL_LEADERBOARD_REQUEST)) {
+            mode = new MNWSInfoRequestLeaderboard.LeaderboardModeCurrUserAnyGameLocal(gameId,gameSetId,period);
+          }
+          else {
+            handler.sendEmptyMessage(INVALID_REQUEST);
+            return;
+          }
 
-		if (request.equalsIgnoreCase(CURRUSER_LEADERBOARD_REQUEST)) {
-			blockName = content.addCurrUserLeaderboard(scope, period);
-		} else if (request.equalsIgnoreCase(ANYGAME_LEADERBOARD_REQUEST)) {
-			blockName = content.addAnyGameLeaderboardGlobal(gameId, gameSetId,
-					period);
-		} else if (request.equalsIgnoreCase(ANYUSERGLOBAL_LEADERBOARD_REQUEST)) {
-			blockName = content.addAnyUserAnyGameLeaderboardGlobal(userId,
-					gameId, gameSetId, period);
-		} else if (request.equalsIgnoreCase(CURRUSERLOCAL_LEADERBOARD_REQUEST)) {
-			blockName = content.addCurrUserAnyGameLeaderboardLocal(gameId,
-					gameSetId, period);
-		} else {
-			handler.sendEmptyMessage(INVALID_REQUEST);
-			return;
-		}
+          MNDirect.getWSProvider().send
+           (new MNWSInfoRequestLeaderboard
+             (mode,new MyLeaderboardResponseHandler()));
+          handler.sendEmptyMessage(UPDATE_BEGIN_COMMAND);
+        }
 
-		// create "request sender" object
-		MNWSRequestSender sender = new MNWSRequestSender(MNDirect.getSession());
+	class MyLeaderboardResponseHandler implements MNWSInfoRequestLeaderboard.IEventHandler {
+          public void onCompleted (MNWSInfoRequestLeaderboard.RequestResult result) {
+            if (!result.hadError()) {
+              leaderboard.clear();
 
-		// send the "authorized" request, passing the created content object and
-		// event handler
-		sender.sendWSRequestAuthorized(content,
-				new MyLeaderboardResponseHandler(blockName));
-		handler.sendEmptyMessage(UPDATE_BEGIN_COMMAND);
-	}
+              for (MNWSLeaderboardListItem item : result.getDataEntry()) {
+                leaderboard.add(item);
+              }
 
-	class MyLeaderboardResponseHandler implements IMNWSRequestEventHandler {
-		String blockName;
-
-		MyLeaderboardResponseHandler(String blockName) {
-			this.blockName = blockName;
-		}
-
-		@SuppressWarnings("unchecked")
-		@Override
-		public void onRequestCompleted(MNWSResponse response) {
-			// get leaderboard data from response, using block name which was
-			// previously retrieved from
-			// MNWSRequestContent.addCurrUserLeaderboard call
-			// "leaderboard" requests return data as a list of
-			// MNWSLeaderboardListItem objects, so
-			// it is safe to cast explicit result of this call to
-			// List<MNWSLeaderboardListItem>
-			leaderboard.clear();
-			leaderboard.addAll((List<MNWSLeaderboardListItem>) response
-					.getDataForBlock(blockName));
-
-			handler.sendEmptyMessage(LIST_UPDATE_COMMAND);
-		}
-
-		@Override
-		public void onRequestError(MNWSRequestError error) {
-			Log.e("PlayerLeaderBoardActivity", error.getMessage());
-		}
+              handler.sendEmptyMessage(LIST_UPDATE_COMMAND);
+            }
+            else {
+              Log.e("PlayerLeaderBoardActivity",result.getErrorMessage());
+            }
+          }
 	}
 
 	@Override
