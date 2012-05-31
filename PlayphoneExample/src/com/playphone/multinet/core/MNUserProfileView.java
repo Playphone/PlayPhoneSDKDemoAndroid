@@ -1277,7 +1277,20 @@ public class MNUserProfileView extends FrameLayout
       this.webView = webView;
      }
 
-    public void callAppHost (String requestURLString)
+    // WebView may call this method not on UI thread, so it
+    // have to be wrapped into runOnUiThread() call
+    public void callAppHost (final String requestURLString)
+     {
+      runOnUiThread(new Runnable()
+       {
+        public void run ()
+         {
+          callAppHostUiThread(requestURLString);
+         }
+       });
+     }
+
+    private void callAppHostUiThread (String requestURLString)
      {
       if (!isWebViewLocationTrusted(webView))
        {

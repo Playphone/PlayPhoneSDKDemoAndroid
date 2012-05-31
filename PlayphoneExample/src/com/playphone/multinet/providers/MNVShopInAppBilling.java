@@ -158,6 +158,31 @@ class MNVShopInAppBilling implements MNInAppBilling.IEventHandler
     inAppBillingActivityManager = manager;
    }
 
+  /* package */ void sendRestoreTransactionsRequest ()
+   {
+    MNInAppBilling.SyncResponse syncResponse = null;
+
+    try
+     {
+      syncResponse = MNInAppBilling.sendRestoreTransactionRequest
+                      (MNInAppBillingNonces.generate());
+     }
+    catch (RemoteException e)
+     {
+      Log.w(TAG,"sending 'restore transactions' request failed with exception " +
+                e.toString());
+     }
+
+    if (syncResponse != null)
+     {
+      if (!syncResponse.requestSucceeded())
+       {
+        Log.w(TAG,"sending 'restore transactions' request failed with status " +
+                   Integer.toString(syncResponse.getResponseCode()));
+       }
+     }
+   }
+
   /* MNVShopInAppBilling.IEventHandler methods */
 
   public synchronized void onServiceBecomeAvailable ()

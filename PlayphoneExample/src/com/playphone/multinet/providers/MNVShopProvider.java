@@ -754,6 +754,17 @@ public class MNVShopProvider
    }
 
   /**
+   * Sends 'RESTORE TRANSACTIONS' request
+   *
+   * In most cases there is no need to use this method because
+   * information on purchases is restored each time player logs in.
+   **/
+  public void sendRestoreTransactionsRequest ()
+   {
+    inAppBilling.sendRestoreTransactionsRequest();
+   }
+
+  /**
    * Returns status of virtual shop
    * @return true if virtual shop is ready to purchase operations, false - otherwise
    **/

@@ -283,6 +283,24 @@ public class MNInAppBilling
     return new SyncResponse(marketService.sendBillingRequest(requestBundle));
    }
 
+  public static synchronized SyncResponse sendRestoreTransactionRequest
+                                           (long requestNonce) throws RemoteException
+   {
+    if (marketService == null)
+     {
+      MNInAppBillingLog.e(MNInAppBilling.class,"unable to send 'restore transactions' request - service is not bound");
+
+      return SyncResponse.ErrorResponse;
+     }
+
+    Bundle requestBundle = makeRequestBundle(MNInAppBillingService.REQUEST_TYPE_RESTORE_TRANSACTIONS);
+
+    requestBundle.putLong
+     (MNInAppBillingService.REQUEST_BUNDLE_KEY_REQUEST_NONCE,requestNonce);
+
+    return new SyncResponse(marketService.sendBillingRequest(requestBundle));
+   }
+
   public static synchronized SyncResponse sendConfirmNotificationsRequest
                                            (String[] notifyIdentifiers) throws RemoteException
    {

@@ -22,6 +22,7 @@ public class MNInAppBillingService extends Service implements ServiceConnection
   public static final String REQUEST_TYPE_REQUEST_PURCHASE         = "REQUEST_PURCHASE";
   public static final String REQUEST_TYPE_GET_PURCHASE_INFORMATION = "GET_PURCHASE_INFORMATION";
   public static final String REQUEST_TYPE_CONFIRM_NOTIFICATIONS    = "CONFIRM_NOTIFICATIONS";
+  public static final String REQUEST_TYPE_RESTORE_TRANSACTIONS     = "RESTORE_TRANSACTIONS";
 
   public static final String REQUEST_BUNDLE_KEY_BILLING_REQUEST   = "BILLING_REQUEST";
   public static final String REQUEST_BUNDLE_KEY_API_VERSION       = "API_VERSION";
