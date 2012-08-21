@@ -463,8 +463,13 @@ public class MNUserProfileView extends FrameLayout
 
   private void runOnUiThread (Runnable action)
    {
-    ((MNPlatformAndroid)session.getPlatform())
-     .getActivity().runOnUiThread(action);
+    final MNSession session = this.session;
+
+    if (session != null)
+     {
+      ((MNPlatformAndroid)session.getPlatform())
+       .getActivity().runOnUiThread(action);
+     }
    }
 
   private void scheduleLoadUrl (final MNSafeWebView webView,
