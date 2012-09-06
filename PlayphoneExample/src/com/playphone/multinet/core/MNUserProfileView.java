@@ -1002,6 +1002,8 @@ public class MNUserProfileView extends FrameLayout
                                         /*  LayoutParams.WRAP_CONTENT */ 0,
                                         1));
 
+    disableHWRenderingOnIncompatibleDevices(webView);
+
     loadBootPage();
 
     navBarView = new MNSafeWebView(context);
@@ -1017,6 +1019,8 @@ public class MNUserProfileView extends FrameLayout
                                           (LayoutParams.FILL_PARENT,
                                            convertDpToPx(context,NAV_BAR_DEFAULT_HEIGHT),
                                            0));
+
+    disableHWRenderingOnIncompatibleDevices(navBarView);
 
     navBarView.setVisibilitySafe(View.GONE);
 
@@ -2937,6 +2941,18 @@ public class MNUserProfileView extends FrameLayout
      }
    }
 
+  private void disableHWRenderingOnIncompatibleDevices (View view)
+   {
+    int sdkVersion = Integer.parseInt(android.os.Build.VERSION.SDK);
+
+    // Android 3.2 has some problems with rendering WebView with HW
+    // acceleration enabled
+    if (sdkVersion == android.os.Build.VERSION_CODES.HONEYCOMB_MR2)
+     {
+      HardwareAccelerationController.disableHardwareRendering(view);
+     }
+   }
+
   private static class WebStorageController
    {
     public static void enableWebStorage (WebView webView, String storagePath)
@@ -2946,6 +2962,14 @@ public class MNUserProfileView extends FrameLayout
       webSettings.setDatabaseEnabled(true);
       webSettings.setDatabasePath(storagePath);
       webSettings.setDomStorageEnabled(true);
+     }
+   }
+
+  private static class HardwareAccelerationController
+   {
+    public static void disableHardwareRendering (View v)
+     {
+      v.setLayerType(View.LAYER_TYPE_SOFTWARE,null);
      }
    }
 
