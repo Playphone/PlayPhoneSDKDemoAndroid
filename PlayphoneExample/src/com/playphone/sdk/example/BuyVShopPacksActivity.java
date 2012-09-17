@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.playphone.multinet.MNDirect;
 import com.playphone.multinet.MNDirectUIHelper;
+import com.playphone.multinet.providers.MNVItemsProvider;
 import com.playphone.multinet.providers.MNVShopProvider;
 import com.playphone.multinet.providers.MNVShopProvider.VShopPackInfo;
 
@@ -52,7 +53,7 @@ public class BuyVShopPacksActivity extends CustomTitleActivity implements OnClic
 		packs.clear();
 		for(VShopPackInfo vShopPack : vShopPacks)
 		{
-			String textToDisplay = vShopPack.name + " (" + getPriceString(vShopPack.priceValue) + ")";
+			String textToDisplay = vShopPack.name + " (" + getPriceString(vShopPack) + ")";
 			packs.put(textToDisplay, vShopPack);
 		}
 		
@@ -123,13 +124,32 @@ public class BuyVShopPacksActivity extends CustomTitleActivity implements OnClic
 				
 	}
 	
-	private String getPriceString(long money){
+	private String getPriceString(MNVShopProvider.VShopPackInfo packInfo){
+		long money = packInfo.priceValue;
+		String result = "";
 		String currencySign = "$";
 		String delimiter = ".";
 		long subCoinConversion = 100;
 		String coin = String.valueOf(money / subCoinConversion);
 		String subcoin = String.valueOf(money % subCoinConversion);
-		return currencySign + coin + delimiter + subcoin;				
+		
+		if (packInfo.priceItemId > 0) {		
+	        //Pack priced in virtual currency
+			MNVItemsProvider.GameVItemInfo priceItemInfo = MNDirect.getVItemsProvider().findGameVItemById(packInfo.priceItemId);
+
+			currencySign = priceItemInfo.name;
+			coin = String.valueOf(money);
+		}
+
+		if (packInfo.priceItemId > 0) {
+	        //Pack priced in virtual currency
+			result = coin + " " + currencySign;
+		}
+		else {
+			result = currencySign + coin + delimiter + subcoin;
+		}
+
+		return result;
 	}
 
 	@Override
@@ -142,9 +162,24 @@ public class BuyVShopPacksActivity extends CustomTitleActivity implements OnClic
 			Log.d("playphone","Attempting to buy pack id " + currentSelectedPack.id);
 			final int[] packs   = { currentSelectedPack.id};
 			final int[] amounts = { 1 };
-			 
-			MNDirect.getVShopProvider().execCheckoutVShopPacks
-			 (packs,amounts,MNDirect.getVItemsProvider().getNewClientTransactionId());
+
+			if (currentSelectedPack.priceValue == 0) {
+		        //Free pack
+				MNDirect.getVShopProvider().procCheckoutVShopPacksSilent
+				(packs,amounts,MNDirect.getVItemsProvider().getNewClientTransactionId());
+			}
+			else if (currentSelectedPack.priceItemId <= 0)
+			{
+		        //Pack priced in real currency
+				MNDirect.getVShopProvider().execCheckoutVShopPacks
+				(packs,amounts,MNDirect.getVItemsProvider().getNewClientTransactionId());
+			}
+			else
+			{
+		        //Pack priced in virtual currency or free
+				MNDirect.getVShopProvider().procCheckoutVShopPacksSilent
+				(packs,amounts,MNDirect.getVItemsProvider().getNewClientTransactionId());
+			}
 		}
 		
 	}
