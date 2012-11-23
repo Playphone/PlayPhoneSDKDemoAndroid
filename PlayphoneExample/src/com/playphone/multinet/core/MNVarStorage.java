@@ -93,6 +93,29 @@ class MNVarStorage
     this(new PlatformFileStreamFactory(platform),path);
    }
 
+  /* makeSharedInstance flag is used by MNSession to make it's var storage     */
+  /* available to MNInstallReferrerReceiver without introducing race           */
+  /* conditiion. This parameter is not supposed to be used in other subsystems */
+  public MNVarStorage (IMNPlatform platform, String path, boolean makeSharedInstance)
+   {
+    this(new PlatformFileStreamFactory(platform),path);
+
+    if (makeSharedInstance)
+     {
+      setSharedInstance(this);
+     }
+   }
+
+  public static synchronized void setSharedInstance (MNVarStorage instance)
+   {
+    sharedInstance = instance;
+   }
+
+  public static synchronized MNVarStorage getSharedInstance ()
+   {
+    return sharedInstance;
+   }
+
   public synchronized String getValue (String name)
    {
     String val = tempStorage.get(name);
@@ -310,6 +333,8 @@ class MNVarStorage
   private final IFileStreamFactory fileStreamFactory;
   private Hashtable<String,String> tempStorage;
   private Hashtable<String,String> persistentStorage;
+
+  private static MNVarStorage sharedInstance;
 
   private static final String MASK_WILDCARD_CHAR = "*";
 

@@ -123,9 +123,15 @@ public class MNDirectUIHelper {
 
 		MNUserProfileView view = MNDirect.getView();
 
-		if (view != null)
-		{
+		if (view != null) {
 			view.setHostActivity(newHostActivity);
+
+		}
+
+		if (newHostActivity != null) {
+			if (dashboard == null) {
+				dashboard = new Dashboard(newHostActivity);
+			}
 		}
 
 		eventHandlers.beginCall();
@@ -235,7 +241,9 @@ public class MNDirectUIHelper {
 		
 		if (a != null) {
 			dashboard = new Dashboard(a);
-			s.addEventHandler(eh);
+                        if (s != null) {
+ 			        s.addEventHandler(eh);
+                        }
 			upv.addEventHandler(viewEventHandler);
 			dashboard.restoreState();
 		} else {
@@ -375,20 +383,22 @@ public class MNDirectUIHelper {
 			}
 				break;
 			}
-			
-			// install content view into view frame
-			ViewGroup parentView = (ViewGroup) (contentView.getParent());
 
-			if (parentView != null) {
-				parentView.removeView(contentView);
-			}
-			
-			RelativeLayout.LayoutParams clp = new RelativeLayout.LayoutParams(
-					RelativeLayout.LayoutParams.FILL_PARENT,
-					RelativeLayout.LayoutParams.FILL_PARENT);
-			contentView.setLayoutParams(clp);
-			viewFrame.addView(contentView);
-			
+                        if (contentView != null) {
+                             // install content view into view frame
+                             ViewGroup parentView = (ViewGroup) (contentView.getParent());
+
+                             if (parentView != null) {
+                                     parentView.removeView(contentView);
+                             }
+
+                             RelativeLayout.LayoutParams clp = new RelativeLayout.LayoutParams(
+                                             RelativeLayout.LayoutParams.FILL_PARENT,
+                                             RelativeLayout.LayoutParams.FILL_PARENT);
+                             contentView.setLayoutParams(clp);
+                             viewFrame.addView(contentView);
+                        }
+
 			return mnDashboard;
 		}
 

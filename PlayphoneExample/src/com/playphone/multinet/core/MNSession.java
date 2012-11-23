@@ -95,7 +95,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
 
     socNetSessionFB = new MNSocNetSessionFB(platform,this);
 
-    varStorage = new MNVarStorage(platform,VAR_STORAGE_FILE_NAME);
+    varStorage = new MNVarStorage(platform,VAR_STORAGE_FILE_NAME,true);
 
     offlinePack = new MNOfflinePack(platform,gameId,appExtParams,this);
 
@@ -555,6 +555,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
     varStorage.writeToFile(VAR_STORAGE_FILE_NAME);
 
     offlinePack.shutdown();
+    varStorage.setSharedInstance(null);
    }
 
   /**
@@ -3130,7 +3131,7 @@ public class MNSession implements MNSmartFoxFacade.IEventHandler,
   private static final String APP_PROPERTY_VAR_PATH_PREFIX = "prop.";
   private static final int APP_COMMAND_SET_APP_PROPERTY_PREFIX_LEN = APP_COMMAND_SET_APP_PROPERTY_PREFIX.length();
 
-  public static final String CLIENT_API_VERSION = "1_7_1";
+  public static final String CLIENT_API_VERSION = "1_7_3";
 
   private static final String GAME_ZONE_NAME_PREFIX = "Game_";
   private static final String SMARTFOX_EXT_NAME = "MultiNetExtension";

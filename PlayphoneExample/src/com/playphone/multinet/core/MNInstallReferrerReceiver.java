@@ -34,7 +34,15 @@ public class MNInstallReferrerReceiver extends BroadcastReceiver
      {
       try
        {
-        final MNVarStorage storage = getVarStorage(context);
+        /* there should be no race condition between MNSession's constructor */
+        /* and MNInstallReferrerReceiver's onReceive since both supposed to  */
+        /* be run on the same (main) thread                                  */
+        MNVarStorage storage = MNVarStorage.getSharedInstance();
+
+        if (storage == null)
+         {
+          storage = getVarStorage(context);
+         }
 
         storage.setValue(INSTALL_REFERRER_DATA_VAR_NAME,referrer);
         storage.writeToFile(MNSession.VAR_STORAGE_FILE_NAME);
